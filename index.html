@@ -256,6 +256,28 @@
   .bb-stat-label{font-size:10px; color:#9297AA; text-transform:uppercase; letter-spacing:0.04em; font-weight:600;}
   .bb-stat-value{font-family:var(--mono); font-weight:600; color:#161927; font-size:13px;}
   .bb-caption{text-align:center; font-size:12px; color:var(--night-text-soft); margin-top:16px;}
+  .bb-sample{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9A6300; background:#FEF6E7; border:1px dashed rgba(154,99,0,0.35); border-radius:6px; padding:3px 8px; vertical-align:middle;}
+  .bb-sample::before{content:""; width:6px; height:6px; border-radius:50%; background:#F0A93B;}
+  .bb-drill{margin-top:22px; padding-top:20px; border-top:1px dashed rgba(20,25,50,0.14);}
+  .bb-subhead{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;}
+  .bb-subtitle{font-size:15px; font-weight:750; color:#161927; font-family:var(--display);}
+  .bb-subtitle .bb-proj-key{margin-left:6px;}
+  .bb-person-head{display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; gap:14px; padding:0 17px 2px;}
+  @media (max-width:640px){ .bb-person-head{display:none;} }
+  .bb-more{border:1px dashed rgba(20,25,50,0.14); border-radius:12px; padding:9px 16px; display:flex; justify-content:space-between; font-size:12px; color:#6B7080;}
+  .view-points{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:28px;}
+  @media (max-width:760px){ .view-points{grid-template-columns:1fr;} }
+  .view-point{border:1px solid var(--night-line); border-radius:14px; padding:18px 20px; background:rgba(255,255,255,0.03);}
+  .view-point-label{font-family:var(--mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent-2); margin-bottom:6px;}
+  .view-point p{font-size:14px; color:var(--night-text-soft);}
+  .view-point strong{color:var(--night-text); font-weight:600;}
+  .bb-people{display:flex; flex-direction:column; gap:8px;}
+  .bb-person-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:11px 16px; display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; align-items:center; gap:14px; font-size:12.5px;}
+  @media (max-width:640px){ .bb-person-row{grid-template-columns:1fr 1fr; row-gap:8px;} }
+  .bb-person{display:flex; align-items:center; gap:9px;}
+  .bb-avatar{width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800; color:#fff; flex-shrink:0;}
+  .bb-person-name{font-weight:700; color:#161927;}
+  .bb-tickets{font-size:10.5px; color:#9297AA; margin-top:1px;}
 
   /* ---------- Categories ---------- */
   .cat-layout{display:grid; grid-template-columns:220px 1fr; gap:44px; align-items:center; margin-top:44px;}
@@ -457,7 +479,7 @@
             <span class="ticket-status">In Progress</span>
           </div>
           <div class="ticket-title">Typo-tolerant search matching</div>
-          <div class="ticket-meta">Noa Levi, Maya Regev · 14 AI sessions</div>
+          <div class="ticket-meta">Noa Levi, Yael Regev · 14 AI sessions</div>
           <div class="ticket-cost-row">
             <span class="ticket-cost mono">$312</span>
             <span class="ticket-cost-label">AI cost so far</span>
@@ -539,7 +561,7 @@
     <div class="section wrap">
       <p class="eyebrow on-night">The product</p>
       <h2 style="color:var(--night-text);">One dashboard. Total clarity.</h2>
-      <p class="lede" style="color:var(--night-text-soft);">Team leads see the whole picture at a glance. Drill into any project to see exactly who worked on what, and where the AI budget went.</p>
+      <p class="lede" style="color:var(--night-text-soft);">Team leads see the whole picture at a glance. Drill into any project, then switch to a per-person view to see exactly who worked on what, and where the AI budget went.</p>
 
       <div class="browser-frame">
         <div class="browser-chrome">
@@ -550,7 +572,7 @@
         <div class="browser-body">
           <div class="bb-topbar">
             <div>
-              <p class="bb-eyebrow">Team overview</p>
+              <p class="bb-eyebrow">Team overview <span class="bb-sample" style="margin-left:6px;">Example data</span></p>
               <div class="bb-title">My Projects</div>
             </div>
             <div class="bb-tabs">
@@ -604,9 +626,79 @@
               <div></div>
             </div>
           </div>
+
+          <div class="bb-drill">
+          <div class="bb-subhead">
+            <div>
+              <p class="bb-eyebrow">Project drill-down</p>
+              <div class="bb-subtitle">Search Revamp<span class="bb-proj-key">SRCH</span></div>
+            </div>
+            <div class="bb-tabs" aria-label="View">
+              <span class="bb-tab">By ticket</span>
+              <span class="bb-tab active">By person</span>
+            </div>
+          </div>
+          <div class="bb-person-head">
+            <span class="bb-stat-label">Contributor</span>
+            <span class="bb-stat-label">Phase split</span>
+            <span class="bb-stat-label">Sessions</span>
+            <span class="bb-stat-label">AI cost</span>
+          </div>
+          <div class="bb-people">
+            <div class="bb-person-row">
+              <div class="bb-person"><span class="bb-avatar" style="background:#4F46E5;">NL</span><div><div class="bb-person-name">Noa Levi</div><div class="bb-tickets">SRCH-101, SRCH-096</div></div></div>
+              <div class="phase-bar" style="margin:0; height:6px;">
+                <div class="phase-seg" style="width:8%; background:var(--c-planning);"></div>
+                <div class="phase-seg" style="width:64%; background:var(--c-coding);"></div>
+                <div class="phase-seg" style="width:20%; background:var(--c-test);"></div>
+                <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
+              </div>
+              <div class="bb-stat-value">14</div>
+              <div class="bb-stat-value">$245</div>
+            </div>
+            <div class="bb-person-row">
+              <div class="bb-person"><span class="bb-avatar" style="background:#17B8A6;">IB</span><div><div class="bb-person-name">Itai Ben-David</div><div class="bb-tickets">SRCH-104</div></div></div>
+              <div class="phase-bar" style="margin:0; height:6px;">
+                <div class="phase-seg" style="width:12%; background:var(--c-planning);"></div>
+                <div class="phase-seg" style="width:55%; background:var(--c-coding);"></div>
+                <div class="phase-seg" style="width:25%; background:var(--c-test);"></div>
+                <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
+              </div>
+              <div class="bb-stat-value">9</div>
+              <div class="bb-stat-value" style="color:#9A6300;">$172</div>
+            </div>
+            <div class="bb-person-row">
+              <div class="bb-person"><span class="bb-avatar" style="background:#F0A93B;">YR</span><div><div class="bb-person-name">Yael Regev</div><div class="bb-tickets">SRCH-101</div></div></div>
+              <div class="phase-bar" style="margin:0; height:6px;">
+                <div class="phase-seg" style="width:6%; background:var(--c-planning);"></div>
+                <div class="phase-seg" style="width:70%; background:var(--c-coding);"></div>
+                <div class="phase-seg" style="width:18%; background:var(--c-test);"></div>
+                <div class="phase-seg" style="width:6%; background:var(--c-deploy);"></div>
+              </div>
+              <div class="bb-stat-value">11</div>
+              <div class="bb-stat-value">$158</div>
+            </div>
+            <div class="bb-more"><span>+ 1 more contributor</span><span class="mono">$126</span></div>
+          </div>
+          </div>
         </div>
       </div>
-      <p class="bb-caption">Team Overview, shown with illustrative example data.</p>
+      <p class="bb-caption">Illustrative example — the names, projects and numbers shown are fictional.</p>
+
+      <div class="view-points">
+        <div class="view-point">
+          <div class="view-point-label">By project</div>
+          <p><strong>Where the budget goes.</strong> Total AI cost and phase split for every active project.</p>
+        </div>
+        <div class="view-point">
+          <div class="view-point-label">By ticket</div>
+          <p><strong>What each task cost.</strong> Every session matched to the Jira ticket it worked on.</p>
+        </div>
+        <div class="view-point">
+          <div class="view-point-label">By person</div>
+          <p><strong>Who worked on what.</strong> Each contributor's sessions, tickets and AI cost inside a project.</p>
+        </div>
+      </div>
     </div>
   </section>
 
