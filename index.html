@@ -93,6 +93,8 @@
   }
 
   *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
   body{
     margin:0; padding-inline:20px; font-family:var(--sans); color:var(--text);
     background:
@@ -129,12 +131,17 @@
   .brand{display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:800; font-size:17px; color:var(--text); text-decoration:none;}
   .brand-mark{width:26px; height:26px; border-radius:7px; flex-shrink:0;}
   .nav-links{display:flex; align-items:center; gap:28px; font-size:14px; font-weight:600; color:var(--text-soft);}
-  .nav-links a{text-decoration:none;}
+  .nav-links a{text-decoration:none; position:relative; padding-bottom:3px;}
+  .nav-links a::after{content:""; position:absolute; left:0; bottom:0; height:2px; width:0; background:var(--accent); transition:width .22s ease;}
   .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{width:100%;}
   .nav-cta{display:flex; align-items:center; gap:10px;}
   @media (max-width:760px){ .nav-links{display:none;} }
+  .navbar{transition:box-shadow .2s ease;}
+  .navbar.scrolled{box-shadow:0 6px 18px rgba(16,24,40,0.07);}
 
-  .btn{display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:14.5px; padding:11px 20px; border-radius:11px; border:1px solid transparent; text-decoration:none; cursor:pointer; white-space:nowrap;}
+  .btn{display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:14.5px; padding:11px 20px; border-radius:11px; border:1px solid transparent; text-decoration:none; cursor:pointer; white-space:nowrap; transition:transform .12s ease, background .15s ease, box-shadow .15s ease, border-color .15s ease;}
+  .btn:active{transform:scale(0.96);}
   .btn-primary{background:var(--accent); color:#fff; box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);}
   .btn-primary:hover{background:var(--accent-ink);}
   .btn-ghost{background:transparent; border-color:var(--line); color:var(--text);}
@@ -175,13 +182,25 @@
   .hv-bar{flex:1; border-radius:4px 4px 1px 1px; background:linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 55%, transparent));}
   .hv-note{font-size:11px; color:var(--text-faint); text-align:center; margin-top:10px;}
 
+  /* ---------- Hero load-in motion ---------- */
+  @keyframes floatIn{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+  .hero h1{animation:floatIn .55s ease both;}
+  .hero-lede{animation:floatIn .55s ease both; animation-delay:.08s;}
+  .hero-ctas{animation:floatIn .55s ease both; animation-delay:.16s;}
+  .stack-row{animation:floatIn .55s ease both; animation-delay:.24s;}
+  .glass-cluster{animation:floatIn .6s ease both; animation-delay:.1s;}
+  .hv-card:nth-child(1){animation:floatIn .5s ease both; animation-delay:.22s;}
+  .hv-card:nth-child(2){animation:floatIn .5s ease both; animation-delay:.3s;}
+  .hv-card.wide{animation:floatIn .5s ease both; animation-delay:.38s;}
+
   /* ---------- Problem cards ---------- */
   .cards-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:40px;}
   @media (max-width:860px){ .cards-3{grid-template-columns:1fr;} }
   .cards-4{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:40px;}
   @media (max-width:900px){ .cards-4{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:520px){ .cards-4{grid-template-columns:1fr;} }
-  .pcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 24px; box-shadow:var(--shadow);}
+  .pcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 24px; box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+  .pcard:hover{transform:translateY(-4px); border-color:color-mix(in srgb, var(--accent) 30%, var(--line)); box-shadow:0 4px 10px rgba(16,24,40,0.05), 0 20px 44px rgba(80,70,180,0.13);}
   .pcard-icon{width:38px; height:38px; border-radius:10px; background:var(--warn-bg); color:var(--warn-text); display:flex; align-items:center; justify-content:center; margin-bottom:16px;}
   .pcard-icon svg{width:18px; height:18px;}
   .pcard h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
@@ -193,7 +212,8 @@
   .split.reverse .split-visual{order:-1;}
   @media (max-width:900px){ .split.reverse .split-visual{order:0;} }
 
-  .ticket-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 24px;}
+  .ticket-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 24px; transition:transform .18s ease, box-shadow .18s ease;}
+  .ticket-card:hover{transform:translateY(-4px); box-shadow:0 4px 10px rgba(16,24,40,0.05), 0 20px 44px rgba(80,70,180,0.13);}
   .ticket-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
   .ticket-key{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent-ink); background:var(--accent-soft); padding:3px 8px; border-radius:6px;}
   .ticket-status{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:7px; background:var(--good-bg); color:var(--good-text);}
@@ -220,7 +240,8 @@
 
   /* ---------- Status / today ---------- */
   .status-list{display:flex; flex-direction:column; gap:14px; margin-top:40px; max-width:640px;}
-  .status-row{display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 20px; box-shadow:var(--shadow);}
+  .status-row{display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 20px; box-shadow:var(--shadow); transition:transform .18s ease, border-color .18s ease;}
+  .status-row:hover{transform:translateX(4px); border-color:color-mix(in srgb, var(--accent-2) 35%, var(--line));}
   .status-icon{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .status-icon.done{background:var(--good-bg); color:var(--good-text);}
   .status-icon.next{background:var(--warn-bg); color:var(--warn-text);}
@@ -240,7 +261,8 @@
   .bb-eyebrow{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#6B7080; margin:0 0 4px;}
   .bb-title{font-size:19px; font-weight:750; color:#161927; font-family:var(--display);}
   .bb-tabs{display:flex; gap:2px; background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:9px; padding:3px;}
-  .bb-tab{font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; color:#6B7080;}
+  .bb-tab{font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; color:#6B7080; border:none; background:transparent; cursor:pointer; font-family:inherit; transition:background .15s ease, color .15s ease;}
+  .bb-tab:hover:not(.active){background:rgba(20,25,50,0.05);}
   .bb-tab.active{background:#4F46E5; color:#fff;}
   .bb-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;}
   @media (max-width:640px){ .bb-grid{grid-template-columns:1fr 1fr;} }
@@ -249,7 +271,8 @@
   .bb-value{font-family:var(--mono); font-size:23px; font-weight:650; color:#161927;}
   .bb-cap{font-size:11px; color:#6B7080; margin-top:4px;}
   .bb-rows{display:flex; flex-direction:column; gap:8px;}
-  .bb-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:13px 16px; display:grid; grid-template-columns:1.6fr 0.8fr 1fr auto; align-items:center; gap:14px; font-size:12.5px;}
+  .bb-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:13px 16px; display:grid; grid-template-columns:1.6fr 0.8fr 1fr auto; align-items:center; gap:14px; font-size:12.5px; transition:transform .18s ease, box-shadow .18s ease;}
+  .bb-row:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,24,40,0.08);}
   @media (max-width:640px){ .bb-row{grid-template-columns:1fr; gap:8px;} }
   .bb-proj-name{font-weight:700; color:#161927; font-size:13.5px;}
   .bb-proj-key{font-family:var(--mono); font-size:10px; color:#4F46E5; background:#EEEDFD; padding:1px 6px; border-radius:5px; font-weight:700; margin-left:8px;}
@@ -272,7 +295,8 @@
   .view-point p{font-size:14px; color:var(--night-text-soft);}
   .view-point strong{color:var(--night-text); font-weight:600;}
   .bb-people{display:flex; flex-direction:column; gap:8px;}
-  .bb-person-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:11px 16px; display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; align-items:center; gap:14px; font-size:12.5px;}
+  .bb-person-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:11px 16px; display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; align-items:center; gap:14px; font-size:12.5px; transition:transform .18s ease, box-shadow .18s ease;}
+  .bb-person-row:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,24,40,0.08);}
   @media (max-width:640px){ .bb-person-row{grid-template-columns:1fr 1fr; row-gap:8px;} }
   .bb-person{display:flex; align-items:center; gap:9px;}
   .bb-avatar{width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800; color:#fff; flex-shrink:0;}
@@ -303,7 +327,8 @@
   /* ---------- Trust ---------- */
   .trust-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:44px;}
   @media (max-width:760px){ .trust-grid{grid-template-columns:1fr;} }
-  .trust-item{display:flex; gap:16px;}
+  .trust-item{display:flex; gap:16px; transition:transform .18s ease;}
+  .trust-item:hover{transform:translateY(-3px);}
   .trust-icon{width:40px; height:40px; border-radius:11px; background:rgba(63,224,203,0.12); color:var(--accent-2); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .night-panel .trust-icon{background:rgba(63,224,203,0.14);}
   .trust-icon svg{width:19px; height:19px;}
@@ -576,15 +601,15 @@
               <div class="bb-title">My Projects</div>
             </div>
             <div class="bb-tabs">
-              <span class="bb-tab">Today</span>
-              <span class="bb-tab active">Last 3 Days</span>
-              <span class="bb-tab">Last Sprint</span>
+              <button type="button" class="bb-tab" data-range="today">Today</button>
+              <button type="button" class="bb-tab active" data-range="3d">Last 3 Days</button>
+              <button type="button" class="bb-tab" data-range="sprint">Last Sprint</button>
             </div>
           </div>
           <div class="bb-grid">
             <div class="bb-card">
               <div class="bb-label">Total Team Spend</div>
-              <div class="bb-value">$1,638</div>
+              <div class="bb-value" id="bbSpend">$1,638</div>
               <div class="bb-cap">Across 4 active projects</div>
             </div>
             <div class="bb-card">
@@ -594,16 +619,16 @@
             </div>
             <div class="bb-card">
               <div class="bb-label">Needs Review</div>
-              <div class="bb-value" style="color:#9A6300;">2</div>
+              <div class="bb-value" id="bbReview" style="color:#9A6300;">2</div>
               <div class="bb-cap">Below 85% match confidence</div>
             </div>
           </div>
           <div class="bb-rows">
             <div class="bb-row">
               <div><span class="bb-proj-name">Search Revamp</span><span class="bb-proj-key">SRCH</span></div>
-              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value">$701</div></div>
+              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value" id="bbCostSRCH">$701</div></div>
               <div><div class="bb-stat-label">Phase split</div>
-                <div class="phase-bar" style="margin:0; height:7px;">
+                <div class="phase-bar" id="bbPhaseSRCH" style="margin:0; height:7px;">
                   <div class="phase-seg" style="width:10%; background:var(--c-planning);"></div>
                   <div class="phase-seg" style="width:60%; background:var(--c-coding);"></div>
                   <div class="phase-seg" style="width:22%; background:var(--c-test);"></div>
@@ -614,9 +639,9 @@
             </div>
             <div class="bb-row">
               <div><span class="bb-proj-name">Checkout Redesign</span><span class="bb-proj-key">PAY</span></div>
-              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value">$482</div></div>
+              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value" id="bbCostPAY">$482</div></div>
               <div><div class="bb-stat-label">Phase split</div>
-                <div class="phase-bar" style="margin:0; height:7px;">
+                <div class="phase-bar" id="bbPhasePAY" style="margin:0; height:7px;">
                   <div class="phase-seg" style="width:15%; background:var(--c-planning);"></div>
                   <div class="phase-seg" style="width:55%; background:var(--c-coding);"></div>
                   <div class="phase-seg" style="width:20%; background:var(--c-test);"></div>
@@ -653,8 +678,8 @@
                 <div class="phase-seg" style="width:20%; background:var(--c-test);"></div>
                 <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
               </div>
-              <div class="bb-stat-value">14</div>
-              <div class="bb-stat-value">$245</div>
+              <div class="bb-stat-value" id="bbSess0">14</div>
+              <div class="bb-stat-value" id="bbPCost0">$245</div>
             </div>
             <div class="bb-person-row">
               <div class="bb-person"><span class="bb-avatar" style="background:#17B8A6;">IB</span><div><div class="bb-person-name">Itai Ben-David</div><div class="bb-tickets">SRCH-104</div></div></div>
@@ -664,8 +689,8 @@
                 <div class="phase-seg" style="width:25%; background:var(--c-test);"></div>
                 <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
               </div>
-              <div class="bb-stat-value">9</div>
-              <div class="bb-stat-value" style="color:#9A6300;">$172</div>
+              <div class="bb-stat-value" id="bbSess1">9</div>
+              <div class="bb-stat-value" id="bbPCost1" style="color:#9A6300;">$172</div>
             </div>
             <div class="bb-person-row">
               <div class="bb-person"><span class="bb-avatar" style="background:#F0A93B;">YR</span><div><div class="bb-person-name">Yael Regev</div><div class="bb-tickets">SRCH-101</div></div></div>
@@ -675,10 +700,10 @@
                 <div class="phase-seg" style="width:18%; background:var(--c-test);"></div>
                 <div class="phase-seg" style="width:6%; background:var(--c-deploy);"></div>
               </div>
-              <div class="bb-stat-value">11</div>
-              <div class="bb-stat-value">$158</div>
+              <div class="bb-stat-value" id="bbSess2">11</div>
+              <div class="bb-stat-value" id="bbPCost2">$158</div>
             </div>
-            <div class="bb-more"><span>+ 1 more contributor</span><span class="mono">$126</span></div>
+            <div class="bb-more"><span>+ 1 more contributor</span><span class="mono" id="bbPCostMore">$126</span></div>
           </div>
           </div>
         </div>
@@ -881,6 +906,66 @@
       navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); });
     }catch(e){ done(false); }
   }
+
+  // Sticky nav gains a shadow once the page scrolls
+  (function(){
+    var nav = document.querySelector('.navbar');
+    if(!nav) return;
+    function onScroll(){ nav.classList.toggle('scrolled', window.scrollY > 8); }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  })();
+
+  // Interactive dashboard preview: switch time range, swap real numbers
+  (function(){
+    var DATA = {
+      today:  { spend:'$612',   review:'1', SRCH:{cost:'$271',   phases:[8,62,22,8]},  PAY:{cost:'$180',   phases:[12,58,20,10]},
+                people:{ sessions:['5','3','4'],    costs:['$95','$66','$61'],    more:'$49' } },
+      '3d':   { spend:'$1,638', review:'2', SRCH:{cost:'$701',   phases:[10,60,22,8]}, PAY:{cost:'$482',   phases:[15,55,20,10]},
+                people:{ sessions:['14','9','11'],  costs:['$245','$172','$158'], more:'$126' } },
+      sprint: { spend:'$4,920', review:'4', SRCH:{cost:'$1,890', phases:[9,61,21,9]},  PAY:{cost:'$1,540', phases:[18,52,20,10]},
+                people:{ sessions:['38','24','30'], costs:['$660','$464','$428'], more:'$338' } }
+    };
+    var PHASE_COLORS = ['var(--c-planning)','var(--c-coding)','var(--c-test)','var(--c-deploy)'];
+    function renderPhaseBar(el, phases){
+      if(!el) return;
+      el.innerHTML = phases.map(function(p, i){
+        return '<div class="phase-seg" style="width:'+p+'%; background:'+PHASE_COLORS[i]+';"></div>';
+      }).join('');
+    }
+    function applyRange(key){
+      var d = DATA[key];
+      if(!d) return;
+      var spendEl = document.getElementById('bbSpend');
+      var reviewEl = document.getElementById('bbReview');
+      var srchCostEl = document.getElementById('bbCostSRCH');
+      var payCostEl = document.getElementById('bbCostPAY');
+      if(spendEl) spendEl.textContent = d.spend;
+      if(reviewEl) reviewEl.textContent = d.review;
+      if(srchCostEl) srchCostEl.textContent = d.SRCH.cost;
+      if(payCostEl) payCostEl.textContent = d.PAY.cost;
+      renderPhaseBar(document.getElementById('bbPhaseSRCH'), d.SRCH.phases);
+      renderPhaseBar(document.getElementById('bbPhasePAY'), d.PAY.phases);
+      d.people.sessions.forEach(function(v, i){
+        var el = document.getElementById('bbSess'+i);
+        if(el) el.textContent = v;
+      });
+      d.people.costs.forEach(function(v, i){
+        var el = document.getElementById('bbPCost'+i);
+        if(el) el.textContent = v;
+      });
+      var moreEl = document.getElementById('bbPCostMore');
+      if(moreEl) moreEl.textContent = d.people.more;
+    }
+    var tabs = document.querySelectorAll('.bb-tab[data-range]');
+    tabs.forEach(function(tab){
+      tab.addEventListener('click', function(){
+        tabs.forEach(function(t){ t.classList.remove('active'); });
+        tab.classList.add('active');
+        applyRange(tab.dataset.range);
+      });
+    });
+  })();
 </script>
 </body>
 </html>
