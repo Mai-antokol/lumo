@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>llumooo</title>
-<meta name="description" content="llumooo — ticket-level AI cost observability and real-time guardrail platform for Claude and Jira.">
+<meta name="description" content="llumooo matches every AI coding session to the ticket it belongs to, so engineering leaders see exactly what their AI spend actually bought.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -196,9 +196,7 @@
   /* ---------- Problem cards ---------- */
   .cards-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:40px;}
   @media (max-width:860px){ .cards-3{grid-template-columns:1fr;} }
-  .cards-4{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:40px;}
-  @media (max-width:900px){ .cards-4{grid-template-columns:repeat(2,1fr);} }
-  @media (max-width:520px){ .cards-4{grid-template-columns:1fr;} }
+  .cards-4{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-top:40px;}
   .pcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 24px; box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
   .pcard:hover{transform:translateY(-4px); border-color:color-mix(in srgb, var(--accent) 30%, var(--line)); box-shadow:0 4px 10px rgba(16,24,40,0.05), 0 20px 44px rgba(80,70,180,0.13);}
   .pcard-icon{width:38px; height:38px; border-radius:10px; background:var(--warn-bg); color:var(--warn-text); display:flex; align-items:center; justify-content:center; margin-bottom:16px;}
@@ -316,6 +314,7 @@
   .cat-name{flex:1; font-size:14.5px; font-weight:600;}
   .cat-pct{font-family:var(--mono); font-weight:700; font-size:14.5px;}
   .cat-note{grid-column:1/-1; margin-top:8px; font-size:14px; color:var(--text-soft); border-top:1px solid var(--line); padding-top:20px;}
+  .cat-example{grid-column:1/-1; margin-top:14px; font-size:14px; color:var(--text); background:var(--accent-soft); border-radius:12px; padding:16px 20px; line-height:1.55;}
 
   /* ---------- Approach quote band ---------- */
   .quote-band{text-align:center;}
@@ -375,6 +374,8 @@
 </style>
 </head>
 <body>
+
+
 <nav class="navbar">
   <div class="wrap nav-row">
     <a class="brand" href="#top">
@@ -400,16 +401,17 @@
     <div class="hero-grid">
       <div>
         <p class="eyebrow">AI cost observability for engineering teams</p>
-        <h1>Know exactly what every Jira ticket costs in AI.</h1>
-        <p class="hero-lede">llumooo matches every Claude Code session to the ticket it belongs to — so AI spend becomes a property of the work, not a mystery line on your bill.</p>
+        <h1>Know exactly what every ticket costs in AI.</h1>
+        <p class="hero-lede">llumooo matches every AI coding session to the ticket it belongs to — so you see not just what each ticket cost, but what that cost actually bought: the code, the PRs, the time by phase, and whether it was worth it.</p>
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#access">Get in Touch</a>
           <a class="btn btn-ghost" href="#how">See how it works</a>
         </div>
         <div class="stack-row">
-          <span class="stack-label">Built for teams running</span>
+          <span class="stack-label">Currently integrates with</span>
           <span class="conn-pill"><span class="conn-dot-badge" style="background:#4F46E5;">C</span>Claude Code</span>
           <span class="conn-pill"><span class="conn-dot-badge" style="background:#2684FF;">J</span>Jira</span>
+          <span class="conn-pill" style="color:var(--text-faint); font-weight:600;">+ more</span>
         </div>
       </div>
 
@@ -485,7 +487,7 @@
       <div>
         <p class="eyebrow">What we're building</p>
         <h2>A project-by-project view of what your AI spend actually buys.</h2>
-        <p class="lede">llumooo breaks AI spend down by the type of work it went to, and connects every session to what it produced — the code changes, the pull requests, the related Jira tasks, and more.</p>
+        <p class="lede">llumooo breaks AI spend down by the type of work it went to, and connects every session to what it produced — the code changes, the pull requests, the related tasks, and more.</p>
         <div class="tag-row">
           <span class="tag">Writing new code</span>
           <span class="tag">Debugging</span>
@@ -717,7 +719,7 @@
         </div>
         <div class="view-point">
           <div class="view-point-label">By ticket</div>
-          <p><strong>What each task cost.</strong> Every session matched to the Jira ticket it worked on.</p>
+          <p><strong>What each task cost.</strong> Every session matched to the ticket it worked on.</p>
         </div>
         <div class="view-point">
           <div class="view-point-label">By person</div>
@@ -744,6 +746,7 @@
         <div class="cat-row"><span class="cat-dot" style="background:var(--c-deploy);"></span><span class="cat-name">Deploy</span><span class="cat-pct">8%</span></div>
       </div>
       <p class="cat-note">Most tickets spend well over half their AI time in Coding — Test and Deploy are often where cost quietly grows without anyone noticing.</p>
+      <p class="cat-example">Example: two similar bug-fix tickets, three weeks apart. One cost $40, almost entirely in Coding. The other cost $160 — over half of it in Debugging. Same type of ticket, 4x the cost. Now you know why.</p>
     </div>
   </section>
 
@@ -757,11 +760,11 @@
       <div class="trust-grid">
         <div class="trust-item">
           <div class="trust-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="9" width="14" height="8" rx="2"/><path d="M6 9V6a4 4 0 0 1 8 0v3"/></svg></div>
-          <div><h3>Aggregated by default</h3><p>Team leads see totals and trends. Individual detail stays with the engineer unless they choose to share it.</p></div>
+          <div><h3>Per-person, never per-conversation</h3><p>Team leads see cost, time and work phase broken down by project, ticket and person. What was typed or generated inside a session is never shown to anyone outside the engineer — not aggregated, not summarized, not at all.</p></div>
         </div>
         <div class="trust-item">
           <div class="trust-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5.5 10 3l7 2.5v5c0 4-3 6.5-7 8.5-4-2-7-4.5-7-8.5Z"/><path d="M7.3 10.2 9.3 12l3.4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div><h3>No message content, ever</h3><p>llumooo reads usage metadata — tokens, time, ticket — never what was typed or generated in a session.</p></div>
+          <div><h3>Content is read, never kept</h3><p>llumooo reads session content to classify the work and understand what happened — what ticket, what phase, what it produced. That content is processed, not retained: no prompts or code are exposed to anyone outside the engineer, and nothing sensitive is stored long-term.</p></div>
         </div>
         <div class="trust-item">
           <div class="trust-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7.2"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg></div>
@@ -779,6 +782,7 @@
   <section class="section wrap" id="compare">
     <p class="eyebrow">Where we're going</p>
     <h2>We're building the intelligence layer for AI adoption across the organization.</h2>
+    <p class="lede">Today, llumooo connects AI usage to the work it produced — inside one team's Claude Code + Jira flow, broken down by project, ticket and person. The direction we're building toward: a system that pulls usage from every AI tool a team runs, matches it to the organization's real work and business context, and turns that into answers for every level of management — not only team leads.</p>
 
     <div class="cards-4">
       <div class="pcard">
@@ -809,6 +813,13 @@
         <h3>Skills insight</h3>
         <p>Spot where teams keep relying on AI to cover knowledge gaps, so leaders know where to invest in training.</p>
       </div>
+      <div class="pcard">
+        <div class="pcard-icon" style="background:var(--accent-soft); color:var(--accent-ink);">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="10" width="4" height="6.5" rx="1"/><rect x="8.5" y="5" width="4" height="11.5" rx="1"/><circle cx="15.3" cy="7.3" r="2.6"/><path d="M17.3 9.3 18.7 10.7"/></svg>
+        </div>
+        <h3>Benchmarking</h3>
+        <p>Compare similar tickets and projects to spot the ones costing far more than they should — and surface the pattern behind the gap, whether it's rework, debugging loops, or scope creep.</p>
+      </div>
     </div>
   </section>
 
@@ -823,7 +834,7 @@
     <div class="section-narrow wrap">
       <span class="pilot-badge"><span class="pilot-dot"></span>Early stage</span>
       <h2 style="color:var(--night-text); max-width:560px;">Built by people who felt this problem firsthand.</h2>
-      <p class="lede" style="color:var(--night-text-soft); max-width:520px;">llumooo is an early-stage company with a working product, already tracking real AI cost and delivery across real projects. If you lead an R&amp;D team running Claude and Jira and want to know what your AI spend actually buys you, we'd like to talk.</p>
+      <p class="lede" style="color:var(--night-text-soft); max-width:520px;">llumooo is an early-stage company with a working product, already tracking real AI cost and delivery across real projects. If you lead an R&amp;D team adopting AI coding tools and want to know what your AI spend actually buys you, we'd like to talk.</p>
 
       <div class="access-box">
         <div class="access-row">
@@ -831,7 +842,7 @@
             <div class="access-field-label">Email</div>
             <span class="value-chip" id="emailChip">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h14v10H3Z"/><path d="M3.5 5.5 10 11l6.5-5.5"/></svg>
-              llumoo.ai@gmail.com
+              info@llumooo.com
             </span>
           </div>
           <button class="copy-btn" onclick="copyEmail(this)">
@@ -851,7 +862,7 @@
           <svg class="brand-mark" viewBox="0 0 26 26" fill="none"><rect width="26" height="26" rx="7" fill="#11142A"/><rect x="6" y="14" width="3.6" height="7" rx="1" fill="#8B93F8"/><rect x="11.2" y="8.5" width="3.6" height="12.5" rx="1" fill="#4F46E5"/><rect x="16.4" y="11" width="3.6" height="10" rx="1" fill="#F0A93B"/></svg>
           llumooo
         </a>
-        <p>The first ticket-level AI cost observability and real-time guardrail platform for Claude and Jira.</p>
+        <p>The first platform that connects AI coding spend to the work it actually produced — ticket by ticket, project by project.</p>
       </div>
       <div class="footer-col">
         <h4>Product</h4>
@@ -877,7 +888,7 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 llumooo. All figures shown are illustrative examples.</span>
-      <span>Made for teams who ship with Claude Code.</span>
+      <span>Built for engineering teams adopting AI coding tools.</span>
     </div>
   </footer>
 
@@ -885,7 +896,7 @@
 
 <script>
   function copyEmail(btn){
-    var text = "llumoo.ai@gmail.com";
+    var text = "info@llumooo.com";
     var label = btn.querySelector('span');
     function done(ok){
       label.textContent = ok ? 'Copied' : 'Copy';
@@ -956,5 +967,6 @@
     });
   })();
 </script>
+
 </body>
 </html>
