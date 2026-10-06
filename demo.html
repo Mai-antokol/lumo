@@ -1,0 +1,1149 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>llumooo</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"><style>
+/* ===================================================================
+   DESIGN PLAN
+   Color   — neutral warm-grey paper + near-black ink, so the page
+             itself stays quiet; the ledger-green accent carries all
+             the "ledger" character instead of tinting every surface.
+             Status colors (good/warn/bad) kept apart from the accent
+             hue and from the 5-way categorical work-type palette
+             (validated with the dataviz skill's contrast/CVD checks).
+   Type    — Hanken Grotesk for UI text, IBM Plex Mono for every number
+             (amounts, dates, counts) — tabular figures read like an
+             actual ledger column.
+   Layout  — fixed left rail of top-level views; a main canvas that
+             drills down (Projects → Project → Ticket) with breadcrumbs;
+             faint horizontal rule-lines behind the canvas, like a
+             ledger pad, at a level that never competes with content.
+   =================================================================== */
+:root{
+  --bg:#F5F4F2; --surface:#FFFFFF; --surface-2:#ECEBE8; --line:#DFDEDA;
+  --ink:#201F1C; --ink-soft:#615F59; --ink-faint:#96948C;
+  --accent:#146356; --accent-ink:#FFFFFF; --accent-soft:#DCEEE7;
+  --good:#1F8A5A; --good-soft:#E3F3EA;
+  --warn:#BD6B14; --warn-soft:#FBEDDB;
+  --bad:#C0453A; --bad-soft:#FBEAE7;
+  --cat-plan:#4C7BE0; --cat-impl:#1F9E82; --cat-test:#C68A1E; --cat-debug:#D9637A; --cat-review:#7D5BA6;
+  --rule: rgba(32,31,28,.045);
+  --f-ui:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r-sm:8px; --r-md:12px; --r-lg:18px;
+  --shadow:0 1px 2px rgba(20,20,18,.05), 0 10px 28px rgba(20,20,18,.07);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#141413; --surface:#1C1C1A; --surface-2:#252422; --line:#34332F;
+  --ink:#ECEBE7; --ink-soft:#A6A49D; --ink-faint:#716F68;
+  --accent:#4FC2A4; --accent-ink:#0B2621; --accent-soft:#1E332C;
+  --good:#3CBE86; --good-soft:#1A2E25;
+  --warn:#E2954A; --warn-soft:#332717;
+  --bad:#E27368; --bad-soft:#331F1C;
+  --cat-plan:#6085D6; --cat-impl:#22A989; --cat-test:#B8872E; --cat-debug:#D96E88; --cat-review:#8C6BC9;
+  --rule: rgba(255,255,255,.035);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#141413; --surface:#1C1C1A; --surface-2:#252422; --line:#34332F;
+  --ink:#ECEBE7; --ink-soft:#A6A49D; --ink-faint:#716F68;
+  --accent:#4FC2A4; --accent-ink:#0B2621; --accent-soft:#1E332C;
+  --good:#3CBE86; --good-soft:#1A2E25;
+  --warn:#E2954A; --warn-soft:#332717;
+  --bad:#E27368; --bad-soft:#331F1C;
+  --cat-plan:#6085D6; --cat-impl:#22A989; --cat-test:#B8872E; --cat-debug:#D96E88; --cat-review:#8C6BC9;
+  --rule: rgba(255,255,255,.035);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.5;margin:0}
+h1,h2,h3{font-family:var(--f-ui);text-wrap:balance}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- shell ---------- */
+.app{display:flex;min-height:100%}
+.rail{width:228px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
+  padding:20px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;
+  top:env(safe-area-inset-top,0px);height:100vh;height:100dvh}
+.brand{display:flex;align-items:center;gap:9px;padding:2px 8px 10px;font-weight:800;font-size:15.5px;letter-spacing:-.01em}
+.brand svg{flex-shrink:0}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-sm);
+  color:var(--ink-soft);font-weight:600;font-size:13.5px;transition:background .14s,color .14s;flex-shrink:0}
+.nav button svg{width:16px;height:16px;flex-shrink:0;opacity:.85}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+.rail-bottom{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.rail-bottom button{flex-shrink:0}
+.rail-foot{font-size:11.5px;color:var(--ink-faint);padding:0 10px}
+
+.main{flex:1;min-width:0;padding:28px clamp(18px,3vw,40px) 60px;position:relative;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--rule) 32px)}
+.view{min-width:0}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.anim-up{animation:fadeUp .34s cubic-bezier(.22,1,.36,1) both}
+.anim-right{animation:fadeRight .34s cubic-bezier(.22,1,.36,1) both}
+.anim-left{animation:fadeLeft .34s cubic-bezier(.22,1,.36,1) both}
+
+/* ---------- header / breadcrumb ---------- */
+.crumb{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-faint);margin-bottom:10px;flex-wrap:wrap}
+.crumb button{all:unset;cursor:pointer;color:var(--accent);font-weight:600}
+.crumb button:hover{text-decoration:underline}
+.topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.eyebrow{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:0 0 4px}
+h1{font-size:23px;margin:0;font-weight:800;letter-spacing:-.015em}
+.subtext{color:var(--ink-soft);font-size:13px;margin:5px 0 0}
+.subtext .sep{color:var(--ink-faint);margin:0 5px}
+.rule-accent{height:3px;border-radius:3px;margin:12px 0 22px;
+  background:linear-gradient(90deg,var(--cat-plan),var(--cat-impl) 35%,var(--cat-test) 60%,var(--cat-debug) 80%,var(--cat-review))}
+
+/* ---------- pill controls ---------- */
+.pillbar{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
+.pillbar button{all:unset;cursor:pointer;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+  border-radius:999px;transition:background .14s,color .14s}
+.pillbar button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabbar{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tabbar button{all:unset;cursor:pointer;padding:9px 4px;margin-right:20px;font-weight:700;font-size:13.5px;
+  color:var(--ink-faint);border-bottom:2px solid transparent;white-space:nowrap}
+.tabbar button[aria-selected="true"]{color:var(--accent);border-color:var(--accent)}
+.tab-panel{display:none}
+.tab-panel.visible{display:block}
+
+/* ---------- grid + cards ---------- */
+.grid{display:grid;gap:14px;grid-template-columns:repeat(12,minmax(0,1fr))}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}
+.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  padding:18px 20px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.card-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.big{font-family:var(--f-mono);font-size:29px;font-weight:600;letter-spacing:-.01em;line-height:1}
+.cap{color:var(--ink-soft);font-size:12.5px}
+.pill-stat{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill-stat.good{background:var(--good-soft);color:var(--good)}
+.pill-stat.warn{background:var(--warn-soft);color:var(--warn)}
+.pill-stat.bad{background:var(--bad-soft);color:var(--bad)}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:30px 0 12px}
+.section-head:first-child{margin-top:0}
+.section-title{font-size:14.5px;font-weight:800}
+.section-sub{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft)}
+.legend-row .sw{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-1px}
+
+/* ---------- phase bar (categorical work-type) ---------- */
+.phase-bar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;width:100%}
+.phase-bar.lg{height:26px;border-radius:8px}
+.phase-seg{height:100%}
+.phase-legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px}
+.phase-legend .item{display:flex;flex-direction:column;gap:3px}
+.phase-legend .lbl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);font-weight:600}
+.phase-legend .lbl i{width:9px;height:9px;border-radius:3px}
+.phase-legend .val{font-family:var(--f-mono);font-size:14.5px;font-weight:600;padding-left:16px}
+
+/* ---------- lists / rows ---------- */
+.rowlist{display:flex;flex-direction:column;gap:10px}
+.rowcard{all:unset;cursor:pointer;display:grid;grid-template-columns:1.6fr .9fr .9fr 1.2fr auto;gap:16px;
+  align-items:center;width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);box-shadow:var(--shadow);padding:15px 18px;font-size:13px;
+  transition:transform .14s ease,border-color .14s ease}
+.rowcard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.rowcard .name-wrap{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left}
+.rowcard .pname{font-weight:700;font-size:14px}
+.rowcard .pmeta{display:flex;align-items:center;gap:8px}
+.key-chip{font-family:var(--f-mono);font-size:10.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);
+  padding:2px 7px;border-radius:5px}
+.since{font-size:11px;color:var(--ink-faint)}
+.stat-lbl{font-size:10.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.stat-val{font-family:var(--f-mono);font-size:14.5px;font-weight:600}
+.avatars{display:flex}
+.avatar{width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:700;color:#fff;border:2px solid var(--surface);flex-shrink:0;margin-left:-7px}
+.avatar:first-child{margin-left:0}
+.flag-chip{display:inline-flex;align-items:center;gap:5px;background:var(--warn-soft);color:var(--warn);
+  font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:7px;white-space:nowrap}
+.flag-chip svg{width:11px;height:11px}
+.chev{color:var(--ink-faint);width:16px;height:16px;flex-shrink:0}
+.status-chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;white-space:nowrap}
+.status-chip.open{background:var(--accent-soft);color:var(--accent)}
+.status-chip.closed{background:var(--surface-2);color:var(--ink-soft)}
+.status-chip.completed{background:var(--surface-2);color:var(--ink-soft)}
+
+@media (max-width:860px){.rowcard{grid-template-columns:1fr;gap:8px;text-align:left}}
+
+/* ---------- insights ---------- */
+.insight{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;border-radius:var(--r-md);
+  background:var(--warn-soft);padding:12px 14px}
+.insight.info{background:var(--accent-soft)}
+.insight.good{background:var(--good-soft)}
+.insight-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}
+.insight b.dot{width:7px;height:7px;border-radius:50%;background:var(--warn);margin-top:6px}
+.insight.info b.dot{background:var(--accent)}
+.insight.good b.dot{background:var(--good)}
+.insight p{margin:0;font-weight:600;font-size:13px;text-align:left}
+.insight .why{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px;font-weight:500;text-align:left}
+.insight .more{color:var(--ink-faint);font-size:12px;white-space:nowrap}
+.insight-detail{text-align:left;font-size:12.5px;color:var(--ink-soft);padding:10px 2px 2px 17px;line-height:1.55}
+
+/* ---------- AI sources mini bars ---------- */
+.src-row{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:12px;align-items:center;font-size:13px;padding:6px 0}
+.src-row .track{height:9px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.src-row .fill{height:100%;background:var(--accent);border-radius:4px}
+.src-row .amt{font-family:var(--f-mono);font-weight:600;text-align:right;min-width:60px}
+
+/* ---------- tickets-over-time gantt (project overview) ---------- */
+.gantt-wrap{overflow-x:auto;padding-bottom:2px}
+.gantt-axis{display:grid;grid-template-columns:168px minmax(0,1fr) auto;gap:14px;align-items:end;min-width:620px;margin-bottom:6px}
+.gantt-axis-ticks{position:relative;height:16px}
+.gantt-axis-ticks span{position:absolute;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-faint);transform:translateX(-50%);white-space:nowrap}
+.gantt-axis-ticks span:first-child{transform:translateX(0)}
+.gantt-axis-ticks span:last-child{transform:translateX(-100%)}
+.gantt-rows{display:flex;flex-direction:column;gap:6px;min-width:620px}
+.gantt-row{all:unset;cursor:pointer;display:grid;grid-template-columns:168px minmax(0,1fr) auto;gap:14px;align-items:center;
+  width:100%;box-sizing:border-box;padding:8px;border-radius:var(--r-sm);transition:background .12s}
+.gantt-row:hover{background:var(--surface-2)}
+.gantt-row:hover .gantt-bar{filter:brightness(1.08)}
+.gantt-label{display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0}
+.gantt-label .tkey{font-family:var(--f-mono);font-size:11px;color:var(--accent);font-weight:700}
+.gantt-label .gttl{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gantt-track{position:relative;height:18px;background:var(--surface-2);border-radius:6px}
+.gantt-bar{position:absolute;top:3px;bottom:3px;border-radius:5px;transition:filter .12s}
+.gantt-bar::before{content:"";position:absolute;left:-4px;top:50%;width:9px;height:9px;margin-top:-4.5px;
+  border-radius:50%;background:inherit;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.gantt-bar.open::after{content:"";position:absolute;right:-4px;top:50%;width:7px;height:7px;margin-top:-3.5px;
+  border-radius:50%;background:inherit;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.gantt-cost{font-family:var(--f-mono);font-weight:600;text-align:right;min-width:62px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:700;
+  padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.clickable{cursor:pointer;transition:background .12s}
+tr.clickable:hover td{background:var(--surface-2)}
+th.r,td.r{text-align:right}
+.person{display:flex;align-items:center;gap:9px}
+.person-name{font-weight:600}
+.mini-bar{display:flex;height:7px;width:100px;border-radius:4px;overflow:hidden;gap:1px}
+
+/* ---------- verdict pills ---------- */
+.verdict{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-block}
+.verdict.good{background:var(--good-soft);color:var(--good)}
+.verdict.mid{background:var(--warn-soft);color:var(--warn)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* ---------- compare two tickets ---------- */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs .side{border:1px solid var(--line);border-radius:var(--r-md);padding:15px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.vs h4{margin:0;font-size:14px}
+.chain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:12.5px}
+.chain li{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:start}
+.chain li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line);margin-top:5px}
+.chain li.ok::before{background:var(--good)}
+.chain li.warn::before{background:var(--warn)}
+@media (max-width:860px){.vs{grid-template-columns:1fr}}
+
+/* ---------- ticket detail: session timeline ---------- */
+.sess-strip{overflow-x:auto;padding-bottom:10px}
+.sess-items{display:flex;gap:22px;position:relative;padding:20px 4px 4px;min-width:min-content}
+.sess-axis{position:absolute;top:26px;left:4px;right:4px;height:2px;background:var(--line);z-index:0}
+.sess-item{width:160px;flex-shrink:0;position:relative;z-index:1}
+.sess-dot{width:13px;height:13px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);margin-bottom:10px}
+.sess-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:12px 13px}
+.sess-date{font-size:10.5px;color:var(--ink-faint);font-weight:600;margin-bottom:8px}
+.sess-person{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.sess-tool{font-size:10.5px;color:var(--ink-faint);font-weight:600;margin-bottom:6px}
+.sess-cost{font-family:var(--f-mono);font-weight:700;font-size:14px;margin-bottom:8px}
+.sess-flags{display:flex;flex-direction:column;gap:5px}
+.sig-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);color:var(--ink-soft);
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:7px;width:fit-content}
+.sig-chip svg{width:11px;height:11px}
+.sig-chip.hot{background:var(--bad-soft);color:var(--bad)}
+
+/* ---------- repositories ---------- */
+.repo-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.repo-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.repo-name{font-weight:700;font-size:14.5px}
+.repo-proj{font-size:11.5px;color:var(--ink-faint)}
+.ring{width:54px;height:54px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative}
+.ring .hole{position:absolute;inset:6px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:12.5px;font-weight:700}
+.repo-kv{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:12.5px}
+.repo-kv dt{color:var(--ink-soft);margin:0}
+.repo-kv dd{margin:0;text-align:right;font-family:var(--f-mono)}
+.docs-chip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px}
+.docs-chip.good{background:var(--good-soft);color:var(--good)}
+.docs-chip.mid{background:var(--warn-soft);color:var(--warn)}
+.docs-chip.bad{background:var(--bad-soft);color:var(--bad)}
+.repo-fix{font-size:12.5px;color:var(--ink-soft);border-left:2px solid var(--line);padding-left:10px;margin:0}
+
+/* ---------- setup ---------- */
+.conn{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.conn:first-of-type{border-top:0}
+.logo-badge{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.conn-meta{flex:1;min-width:0}
+.conn-meta .name{font-weight:700;font-size:13.5px}
+.conn-meta .sub{color:var(--ink-soft);font-size:12px}
+.btn{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:background .14s}
+.btn.on{color:var(--good);background:var(--good-soft);border-color:transparent}
+.note{font-size:12.5px;color:var(--ink-soft);margin:0}
+
+/* ---------- loop aside ---------- */
+.loop-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
+
+/* ---------- mobile rail ---------- */
+@media (max-width:980px){.c3{grid-column:span 6}.c4,.c5,.c7,.c8{grid-column:span 12}.c6{grid-column:span 12}}
+@media (max-width:760px){
+  .app{display:block}
+  .rail{position:sticky;top:env(safe-area-inset-top,0px);height:auto;width:auto;border-right:0;border-bottom:1px solid var(--line);
+    padding:12px 16px;flex-direction:row;align-items:center;gap:0;z-index:5}
+  .brand{padding:0;margin-right:14px}
+  .nav{flex-direction:row;overflow-x:auto;gap:2px}
+  .nav button{padding:9px 8px;gap:6px}
+  .nav button span.lbl{white-space:nowrap}
+  .rail-bottom{margin-top:0;margin-left:auto;flex-direction:row}
+  .rail-foot{display:none}
+  .main{padding:20px 16px 48px}
+  .c3{grid-column:span 12}
+  .vs{grid-template-columns:1fr}
+}
+</style></head><body><div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="4" width="2.4" height="16" rx="1" fill="var(--accent)"/>
+        <rect x="8" y="4" width="2.4" height="16" rx="1" fill="var(--accent)"/>
+        <rect x="13" y="4" width="2.4" height="16" rx="1" fill="var(--accent)"/>
+        <rect x="18" y="4" width="2.4" height="16" rx="1" fill="var(--accent)" opacity=".4"/>
+        <line x1="2" y1="18.5" x2="19" y2="5.5" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      llumooo
+    </div>
+    <nav class="nav" id="nav">
+      <button data-nav="overview" aria-current="true">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 9.5 10 3.5l7 6v7.2a1 1 0 0 1-1 1h-3.4v-5.4H7.4v5.4H4a1 1 0 0 1-1-1Z"/></svg>
+        <span class="lbl">Overview</span>
+      </button>
+      <button data-nav="projects">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3.5" width="14" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="9.5" width="14" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="15.5" width="7" height="1.7" rx="0.85" fill="currentColor"/></svg>
+        <span class="lbl">Projects</span>
+      </button>
+      <button data-nav="repos">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 5.5 10 2l7 3.5v9L10 18l-7-3.5Z"/><path d="M3 5.5 10 9l7-3.5M10 9v9"/></svg>
+        <span class="lbl">Repositories</span>
+      </button>
+    </nav>
+    <div class="rail-bottom">
+      <button data-nav="setup" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--ink-soft);font-weight:600;font-size:13.5px">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="2.6"/><path d="M10 3v2.1M10 14.9V17M3 10h2.1M14.9 10H17M5.1 5.1l1.5 1.5M13.4 13.4l1.5 1.5M5.1 14.9l1.5-1.5M13.4 6.6l1.5-1.5"/></svg>
+        <span class="lbl">Setup</span>
+      </button>
+      <div class="rail-foot">Sample data · for demo purposes</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <section id="view-overview" class="view" data-view></section>
+    <section id="view-projects" class="view" data-view hidden></section>
+    <section id="view-project" class="view" data-view hidden></section>
+    <section id="view-ticket" class="view" data-view hidden></section>
+    <section id="view-repos" class="view" data-view hidden></section>
+    <section id="view-setup" class="view" data-view hidden></section>
+  </main>
+</div>
+
+<script>
+/* ================= helpers ================= */
+const CAT_LIST = ['plan','impl','test','debug','review'];
+const CAT_LABEL = {plan:'Planning',impl:'Implementation',test:'Testing',debug:'Debugging',review:'Review'};
+const CAT_VAR = {plan:'var(--cat-plan)',impl:'var(--cat-impl)',test:'var(--cat-test)',debug:'var(--cat-debug)',review:'var(--cat-review)'};
+const AVATAR_HEX = ['#4C7BE0','#1F9E82','#C68A1E','#D9637A','#7D5BA6','#2B8FA3'];
+function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+function initials(name){ return name.split(' ').map(w=>w[0]).join('').toUpperCase(); }
+function avatarColor(name){ let h=0; for(const c of name) h=(h+c.charCodeAt(0))%AVATAR_HEX.length; return AVATAR_HEX[h]; }
+function esc(s){ return String(s); }
+function phaseBarHTML(phases, big){
+  return CAT_LIST.map(k => phases[k] ? `<div class="phase-seg" style="width:${phases[k]}%;background:${CAT_VAR[k]}" title="${CAT_LABEL[k]}: ${phases[k]}%"></div>` : '').join('');
+}
+function phaseLegendHTML(phases, cost){
+  return CAT_LIST.map(k => phases[k] ? `<div class="item"><span class="lbl"><i style="background:${CAT_VAR[k]}"></i>${CAT_LABEL[k]}</span><span class="val">${phases[k]}%${cost!=null ? ' · ' + fmtMoney(cost*phases[k]/100) : ''}</span></div>` : '').join('');
+}
+function miniBarHTML(phases){ return phaseBarHTML(phases); }
+function avatarsHTML(names, size){
+  size = size || 25;
+  return names.map(n => `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.38)}px;background:${avatarColor(n)}">${initials(n)}</div>`).join('');
+}
+const flagSVG = `<svg viewBox="0 0 20 20" fill="none"><path d="M10 3.4 17.3 16H2.7Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><line x1="10" y1="8" x2="10" y2="11.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.8" r="0.9" fill="currentColor"/></svg>`;
+const chevSVG = `<svg class="chev" viewBox="0 0 20 20" fill="none"><path d="M7.5 4.5l6 5.5-6 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const THRASH_SVG = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a6 6 0 0 1 10.5-3.5M16 8V4h-4"/><path d="M16 12a6 6 0 0 1-10.5 3.5M4 12v4h4"/></svg>`;
+const FANOUT_SVG = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="15" r="1.6" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.6" fill="currentColor" stroke="none"/><path d="M6.3 5.8 13.7 9.3M6.3 14.2 13.7 10.7"/></svg>`;
+const RESUME_SVG = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10a5 5 0 1 1-1.5-3.5"/><path d="M15 4v3h-3"/></svg>`;
+const FLAG_META = {
+  thrash:{label:'Thrashing', icon:THRASH_SVG, tip:'High prompt-to-change ratio in this session — more back-and-forth than usual for this kind of task.'},
+  fanout:{label:'Fan-out', icon:FANOUT_SVG, tip:'Several subagents spawned in this session with no resulting code change.'},
+  resumed:{label:'Resumed after deploy', icon:RESUME_SVG, tip:'Work picked back up after the deploy phase looked complete — worth a look, not proof of a bug.'},
+};
+
+/* ================= mock data ================= */
+const PROJECT_META = {
+  SRCH:{name:'Search Revamp', since:'Jul 14'},
+  PAY:{name:'Checkout Redesign', since:'Jul 28'},
+  NOTIF:{name:'Notifications Service', since:'Aug 2'},
+  ADMIN:{name:'Internal Admin Panel', since:'Aug 20'},
+};
+const COMPLETED_META = {
+  ONB:{name:'Onboarding Flow Revamp', started:'May 5', completed:'Jun 30', duration:'8 weeks'},
+  BILL:{name:'Billing Migration', started:'Apr 1', completed:'Jun 10', duration:'10 weeks'},
+};
+const RANGE_DATA = {
+  today:{ SRCH:{cost:271,flagged:true}, PAY:{cost:180,flagged:false}, NOTIF:{cost:96,flagged:false}, ADMIN:{cost:65,flagged:false} },
+  '3d':{ SRCH:{cost:701,flagged:true}, PAY:{cost:482,flagged:false}, NOTIF:{cost:310,flagged:false}, ADMIN:{cost:145,flagged:false} },
+  sprint:{ SRCH:{cost:1890,flagged:true}, PAY:{cost:1540,flagged:true}, NOTIF:{cost:980,flagged:false}, ADMIN:{cost:510,flagged:false} },
+};
+const COMPLETED_COST = { ONB:1240, BILL:2860 };
+const PHASES = {
+  SRCH:{plan:8,impl:52,test:18,debug:14,review:8},
+  PAY:{plan:14,impl:50,test:18,debug:10,review:8},
+  NOTIF:{plan:20,impl:40,test:20,debug:12,review:8},
+  ADMIN:{plan:26,impl:40,test:16,debug:10,review:8},
+  ONB:{plan:16,impl:48,test:18,debug:10,review:8},
+  BILL:{plan:20,impl:44,test:18,debug:10,review:8},
+};
+const CONTRIBUTORS = {
+  SRCH:[
+    {name:'Noa Levi',sessions:14,cost:245,phases:{plan:8,impl:58,test:22,debug:8,review:4},flagged:false,since:'Jul 14'},
+    {name:'Itai Ben-David',sessions:9,cost:172,phases:{plan:10,impl:40,test:18,debug:26,review:6},flagged:true,since:'Jul 22'},
+    {name:'Maya Regev',sessions:11,cost:158,phases:{plan:6,impl:62,test:18,debug:8,review:6},flagged:false,since:'Jul 14'},
+    {name:'Omer Katz',sessions:6,cost:88,phases:{plan:14,impl:50,test:22,debug:8,review:6},flagged:false,since:'Jul 10'},
+    {name:'Yael Stern',sessions:3,cost:38,phases:{plan:10,impl:58,test:20,debug:6,review:6},flagged:false,since:'Jul 10'},
+  ],
+  PAY:[
+    {name:'Noa Levi',sessions:10,cost:190,phases:{plan:12,impl:54,test:20,debug:8,review:6},flagged:false,since:'Jul 28'},
+    {name:'Ron Amar',sessions:12,cost:210,phases:{plan:16,impl:48,test:20,debug:10,review:6},flagged:false,since:'Jul 28'},
+    {name:'Maya Regev',sessions:4,cost:52,phases:{plan:10,impl:58,test:18,debug:8,review:6},flagged:false,since:'Jul 20'},
+    {name:'Itai Ben-David',sessions:2,cost:30,phases:{plan:18,impl:46,test:18,debug:12,review:6},flagged:false,since:'Jul 20'},
+  ],
+  NOTIF:[
+    {name:'Ron Amar',sessions:8,cost:150,phases:{plan:22,impl:40,test:22,debug:10,review:6},flagged:false,since:'Aug 2'},
+    {name:'Omer Katz',sessions:7,cost:110,phases:{plan:24,impl:38,test:22,debug:10,review:6},flagged:false,since:'Aug 2'},
+    {name:'Yael Stern',sessions:3,cost:50,phases:{plan:18,impl:44,test:22,debug:10,review:6},flagged:false,since:'Aug 10'},
+  ],
+  ADMIN:[
+    {name:'Omer Katz',sessions:5,cost:95,phases:{plan:30,impl:42,test:14,debug:8,review:6},flagged:false,since:'Aug 20'},
+    {name:'Noa Levi',sessions:2,cost:50,phases:{plan:26,impl:44,test:16,debug:8,review:6},flagged:false,since:'Aug 24'},
+  ],
+  ONB:[
+    {name:'Ron Amar',sessions:22,cost:520,phases:{plan:18,impl:50,test:18,debug:8,review:6},flagged:false,since:'May 5'},
+    {name:'Maya Regev',sessions:18,cost:430,phases:{plan:14,impl:54,test:18,debug:8,review:6},flagged:false,since:'May 5'},
+    {name:'Omer Katz',sessions:12,cost:290,phases:{plan:16,impl:50,test:20,debug:8,review:6},flagged:false,since:'May 12'},
+  ],
+  BILL:[
+    {name:'Itai Ben-David',sessions:30,cost:1120,phases:{plan:22,impl:46,test:18,debug:8,review:6},flagged:false,since:'Apr 1'},
+    {name:'Noa Levi',sessions:24,cost:890,phases:{plan:18,impl:50,test:18,debug:8,review:6},flagged:false,since:'Apr 1'},
+    {name:'Ron Amar',sessions:14,cost:520,phases:{plan:20,impl:48,test:18,debug:8,review:6},flagged:false,since:'Apr 15'},
+    {name:'Yael Stern',sessions:9,cost:330,phases:{plan:22,impl:46,test:18,debug:8,review:6},flagged:false,since:'Apr 20'},
+  ],
+};
+const TICKETS = {
+  SRCH:[
+    {key:'SRCH-101',title:'Typo-tolerant search matching',status:'open',assignees:['Noa Levi','Maya Regev'],phases:{plan:10,impl:38,test:14,debug:32,review:6},cost:312,sessions:9,started:'Jul 14',last:'2 hours ago',reviewRounds:4,followupBugs:1,linesChanged:640,verdict:'bad',tStart:0,tSpan:10},
+    {key:'SRCH-104',title:'Filter sidebar UI',status:'open',assignees:['Itai Ben-David'],phases:{plan:15,impl:55,test:20,debug:4,review:6},cost:172,sessions:6,started:'Jul 22',last:'Yesterday',reviewRounds:2,followupBugs:0,linesChanged:310,verdict:'mid',tStart:8,tSpan:9},
+    {key:'SRCH-110',title:'Rebuild search index pipeline',status:'closed',assignees:['Omer Katz','Yael Stern'],phases:{plan:8,impl:60,test:22,debug:4,review:6},cost:126,sessions:5,started:'Jul 10',last:'5 days ago',reviewRounds:1,followupBugs:0,linesChanged:505,verdict:'good',tStart:2,tSpan:6},
+    {key:'SRCH-096',title:'Search analytics logging',status:'open',assignees:['Noa Levi'],phases:{plan:20,impl:50,test:20,debug:4,review:6},cost:91,sessions:4,started:'Aug 5',last:'Today',reviewRounds:1,followupBugs:0,linesChanged:140,verdict:'good',tStart:22,tSpan:8},
+  ],
+  PAY:[
+    {key:'PAY-198',title:'Fraud check integration',status:'closed',assignees:['Maya Regev','Itai Ben-David'],phases:{plan:12,impl:46,test:20,debug:16,review:6},cost:82,sessions:4,started:'Jul 20',last:'6 days ago',reviewRounds:3,followupBugs:1,linesChanged:190,verdict:'mid',tStart:0,tSpan:5},
+    {key:'PAY-210',title:'New payment method selector UI',status:'open',assignees:['Noa Levi','Ron Amar'],phases:{plan:14,impl:56,test:20,debug:4,review:6},cost:250,sessions:7,started:'Jul 28',last:'3 hours ago',reviewRounds:2,followupBugs:0,linesChanged:420,verdict:'good',tStart:8,tSpan:11},
+    {key:'PAY-215',title:'Refund flow redesign',status:'open',assignees:['Ron Amar'],phases:{plan:18,impl:52,test:22,debug:2,review:6},cost:150,sessions:5,started:'Aug 3',last:'Yesterday',reviewRounds:2,followupBugs:0,linesChanged:260,verdict:'good',tStart:14,tSpan:9},
+  ],
+  NOTIF:[
+    {key:'NOTIF-55',title:'Push notification service',status:'open',assignees:['Ron Amar','Omer Katz'],phases:{plan:22,impl:44,test:24,debug:4,review:6},cost:210,sessions:6,started:'Aug 2',last:'1 hour ago',reviewRounds:2,followupBugs:0,linesChanged:380,verdict:'good',tStart:0,tSpan:14},
+    {key:'NOTIF-61',title:'Email digest templates',status:'open',assignees:['Yael Stern'],phases:{plan:28,impl:36,test:26,debug:4,review:6},cost:100,sessions:4,started:'Aug 10',last:'Today',reviewRounds:1,followupBugs:0,linesChanged:120,verdict:'good',tStart:8,tSpan:7},
+  ],
+  ADMIN:[
+    {key:'ADMIN-12',title:'Role-based access control',status:'open',assignees:['Omer Katz'],phases:{plan:32,impl:44,test:14,debug:4,review:6},cost:95,sessions:3,started:'Aug 20',last:'2 days ago',reviewRounds:1,followupBugs:0,linesChanged:160,verdict:'good',tStart:0,tSpan:7},
+    {key:'ADMIN-14',title:'Audit log viewer',status:'open',assignees:['Noa Levi'],phases:{plan:28,impl:46,test:16,debug:4,review:6},cost:50,sessions:2,started:'Aug 24',last:'Today',reviewRounds:1,followupBugs:0,linesChanged:90,verdict:'good',tStart:4,tSpan:5},
+  ],
+  ONB:[
+    {key:'ONB-04',title:'Welcome checklist component',status:'closed',assignees:['Ron Amar'],phases:{plan:18,impl:52,test:20,debug:4,review:6},cost:410,sessions:12,started:'May 5',last:'Jun 28',reviewRounds:2,followupBugs:0,linesChanged:540,verdict:'good',tStart:0,tSpan:54},
+    {key:'ONB-09',title:'Progress tracking backend',status:'closed',assignees:['Maya Regev','Omer Katz'],phases:{plan:20,impl:50,test:20,debug:4,review:6},cost:520,sessions:15,started:'May 14',last:'Jun 29',reviewRounds:2,followupBugs:1,linesChanged:710,verdict:'mid',tStart:9,tSpan:46},
+    {key:'ONB-13',title:'First-run email sequence',status:'closed',assignees:['Ron Amar','Maya Regev'],phases:{plan:16,impl:54,test:20,debug:4,review:6},cost:310,sessions:9,started:'May 22',last:'Jun 30',reviewRounds:1,followupBugs:0,linesChanged:400,verdict:'good',tStart:17,tSpan:39},
+  ],
+  BILL:[
+    {key:'BILL-02',title:'Legacy invoice data migration',status:'closed',assignees:['Itai Ben-David','Noa Levi'],phases:{plan:26,impl:44,test:18,debug:6,review:6},cost:1340,sessions:28,started:'Apr 1',last:'Jun 2',reviewRounds:3,followupBugs:1,linesChanged:2100,verdict:'mid',tStart:0,tSpan:62},
+    {key:'BILL-07',title:'New billing provider integration',status:'closed',assignees:['Ron Amar'],phases:{plan:20,impl:50,test:18,debug:6,review:6},cost:820,sessions:18,started:'Apr 20',last:'Jun 8',reviewRounds:1,followupBugs:0,linesChanged:1240,verdict:'good',tStart:19,tSpan:49},
+    {key:'BILL-11',title:'Reconciliation & rollback tooling',status:'closed',assignees:['Itai Ben-David','Yael Stern'],phases:{plan:22,impl:46,test:20,debug:6,review:6},cost:700,sessions:16,started:'May 2',last:'Jun 10',reviewRounds:2,followupBugs:0,linesChanged:980,verdict:'good',tStart:31,tSpan:39},
+  ],
+};
+/* origin = calendar date ticket day 0 maps to, for this project's timeline axis;
+   nowDay = right edge of the axis (today, for active projects; project end, for completed ones) */
+const TIMELINE_META = {
+  SRCH:{origin:'2026-07-14', nowDay:30},
+  PAY:{origin:'2026-07-20', nowDay:24},
+  NOTIF:{origin:'2026-08-02', nowDay:15},
+  ADMIN:{origin:'2026-08-20', nowDay:9},
+  ONB:{origin:'2026-05-05', nowDay:56},
+  BILL:{origin:'2026-04-01', nowDay:70},
+};
+const AI_SOURCES = {
+  SRCH:[{name:'Claude Code',cost:498},{name:'Cursor',cost:142},{name:'GitHub Copilot',cost:61}],
+  PAY:[{name:'Claude Code',cost:310},{name:'Cursor',cost:120},{name:'GitHub Copilot',cost:52}],
+  NOTIF:[{name:'Claude Code',cost:190},{name:'Cursor',cost:80},{name:'GitHub Copilot',cost:40}],
+  ADMIN:[{name:'Claude Code',cost:95},{name:'Cursor',cost:35},{name:'GitHub Copilot',cost:15}],
+  ONB:[{name:'Claude Code',cost:780},{name:'Cursor',cost:330},{name:'GitHub Copilot',cost:130}],
+  BILL:[{name:'Claude Code',cost:1760},{name:'Cursor',cost:760},{name:'GitHub Copilot',cost:340}],
+};
+const INSIGHTS = {
+  SRCH:[
+    {level:'warn',text:'SRCH-101 is costing 2.4× the project average.',why:'Two sessions on this ticket show 4.8 prompts per code change — well above the 1.8 team average — and one session resumed three days after the deploy phase looked complete.'},
+    {level:'info',text:'Claude Code carries 71% of this project’s spend.',why:'Cursor and Copilot are mostly used for small edits; Claude Code is doing the planning and test-writing sessions, which run longer and cost more per session.'},
+    {level:'good',text:'3 of 4 shipped tickets merged with zero follow-up bugs.',why:'Only SRCH-101 needed rework after merge — the rest closed clean with one review round or fewer.'},
+  ],
+  PAY:[
+    {level:'good',text:'Review rounds are trending down this sprint.',why:'Average review rounds per PR dropped from 2.6 to 1.8 over the last two weeks, mostly on tickets Ron Amar and Noa Levi paired on.'},
+    {level:'info',text:'Fraud check integration took the most debugging time.',why:'PAY-198 spent 16% of its sessions in debugging, against an 8% project average — it touches an external provider with thin test coverage.'},
+  ],
+  NOTIF:[
+    {level:'info',text:'Planning time is higher here than on any other active project.',why:'22–28% of sessions go to planning, versus a 14–20% range elsewhere — the notification rules engine has no written spec, so each ticket starts with discovery.'},
+    {level:'good',text:'No flagged sessions this sprint.',why:'Every session on this project matched a Jira task with high confidence, with no thrashing or fan-out signals.'},
+  ],
+  ADMIN:[
+    {level:'good',text:'The cleanest active project in the portfolio.',why:'Both open tickets are on track for a single review round with no follow-up work — this repo has the org’s best test coverage.'},
+  ],
+  ONB:[
+    {level:'warn',text:'ONB-09 needed a follow-up fix after merge.',why:'The progress-tracking backend shipped with 2 review rounds, then needed a patch 9 days later for a race condition the tests missed.'},
+    {level:'good',text:'Finished 2 weeks ahead of its original estimate.',why:'The project closed in 8 weeks against a 10-week estimate, largely from reusing AI-generated test scaffolding across all three tickets.'},
+  ],
+  BILL:[
+    {level:'warn',text:'BILL-02 is the single costliest ticket across every project.',why:'The legacy invoice migration ran 28 sessions and needed 3 review rounds plus one follow-up fix — migrations without a dry-run environment consistently cost more here.'},
+    {level:'info',text:'This project used more AI spend than any other, by a wide margin.',why:'At $2,860 total, it cost more than Search Revamp and Checkout Redesign combined — the scale of the migration, not inefficiency, explains most of the gap.'},
+  ],
+};
+const COMPARE = { SRCH:{good:'SRCH-110',bad:'SRCH-101'}, PAY:{good:'PAY-210',bad:'PAY-198'}, BILL:{good:'BILL-07',bad:'BILL-02'} };
+const SESSIONS = {
+  'SRCH-101':[
+    {date:'Jul 14',employee:'Noa Levi',cost:42,cat:'plan',tool:'Claude Code',flags:['fanout']},
+    {date:'Jul 14',employee:'Noa Levi',cost:68,cat:'impl',tool:'Claude Code',flags:[]},
+    {date:'Jul 16',employee:'Maya Regev',cost:55,cat:'impl',tool:'Cursor',flags:['thrash']},
+    {date:'Jul 18',employee:'Noa Levi',cost:38,cat:'test',tool:'Claude Code',flags:[]},
+    {date:'Jul 20',employee:'Maya Regev',cost:61,cat:'debug',tool:'Claude Code',flags:[]},
+    {date:'Jul 22',employee:'Noa Levi',cost:48,cat:'debug',tool:'GitHub Copilot',flags:['resumed']},
+  ],
+  'PAY-198':[
+    {date:'Jul 20',employee:'Maya Regev',cost:22,cat:'plan',tool:'Claude Code',flags:[]},
+    {date:'Jul 21',employee:'Itai Ben-David',cost:28,cat:'impl',tool:'Claude Code',flags:[]},
+    {date:'Jul 23',employee:'Maya Regev',cost:18,cat:'debug',tool:'Cursor',flags:['thrash']},
+    {date:'Jul 26',employee:'Itai Ben-David',cost:14,cat:'review',tool:'Claude Code',flags:[]},
+  ],
+};
+/* Picks a tool for session i of n so that, across the whole ticket, the mix
+   approximates this project's AI_SOURCES cost ratio. Demo-data heuristic only. */
+function toolForIndex(sources, i, n){
+  if(!sources || !sources.length) return 'Claude Code';
+  const total = sources.reduce((a,s)=>a+s.cost,0) || 1;
+  const frac = (i + 0.5) / n;
+  let cum = 0;
+  for(const s of sources){
+    cum += s.cost / total;
+    if(frac <= cum) return s.name;
+  }
+  return sources[sources.length - 1].name;
+}
+function autoSessions(t, projectKey){
+  const cats = CAT_LIST.filter(k => t.phases[k] > 0);
+  const n = Math.max(2, Math.min(t.assignees.length + 1, t.sessions, 5));
+  const per = Math.round(t.cost / n);
+  const sources = AI_SOURCES[projectKey] || [];
+  return Array.from({length:n}).map((_,i) => ({
+    date: i===0 ? t.started : (i===n-1 ? t.last : 'mid-ticket'),
+    employee: t.assignees[i % t.assignees.length],
+    cost: i===n-1 ? t.cost - per*(n-1) : per,
+    cat: cats[i % cats.length] || 'impl',
+    tool: toolForIndex(sources, i, n),
+    flags: [],
+  }));
+}
+const REPOS = [
+  {name:'search-service', project:'Search Revamp', sessions:142, mergedClean:71, iter:2.4, coverage:58, docs:'mid', readiness:64, fix:'Thin test coverage around the ranking pipeline means AI changes there need more review rounds than anywhere else in the codebase.'},
+  {name:'checkout-web', project:'Checkout Redesign', sessions:98, mergedClean:85, iter:1.6, coverage:77, docs:'good', readiness:81, fix:'Already in good shape — the main lever left is trimming planning time on payment-provider edge cases.'},
+  {name:'notify-worker', project:'Notifications Service', sessions:61, mergedClean:62, iter:3.1, coverage:41, docs:'bad', readiness:47, fix:'No README and sparse types — AI sessions here average 3.1 iterations before a change lands, the highest in the org.'},
+  {name:'admin-panel', project:'Internal Admin Panel', sessions:33, mergedClean:90, iter:1.3, coverage:68, docs:'good', readiness:86, fix:'The cleanest repo in the portfolio right now — a good reference for what "AI-ready" looks like.'},
+  {name:'billing-core', project:'Billing Migration', sessions:206, mergedClean:74, iter:2.1, coverage:63, docs:'mid', readiness:70, fix:'Coverage improved mid-migration; the remaining gap is around the reconciliation module.'},
+];
+function readinessBand(score){ return score>=75 ? 'good' : score>=55 ? 'mid' : 'bad'; }
+function docsLabel(d){ return d==='good' ? 'Good' : d==='mid' ? 'Partial' : 'Missing'; }
+
+/* ================= state ================= */
+let currentRange = '3d';
+let ctx = { projectKey:null, isCompleted:false };
+
+/* ================= navigation ================= */
+function reveal(id, direction){
+  document.querySelectorAll('.view').forEach(v => { v.hidden = v.id !== id; });
+  const el = document.getElementById(id);
+  el.classList.remove('anim-up','anim-right','anim-left');
+  el.getBoundingClientRect();
+  el.classList.add(direction === 'right' ? 'anim-right' : direction === 'left' ? 'anim-left' : 'anim-up');
+}
+function setNavActive(view){
+  document.querySelectorAll('#nav button').forEach(b => b.removeAttribute('aria-current'));
+  const topLevel = {overview:'overview', projects:'projects', project:'projects', ticket:'projects', repos:'repos'};
+  const key = topLevel[view];
+  if(key){ const btn = document.querySelector(`#nav button[data-nav="${key}"]`); if(btn) btn.setAttribute('aria-current','true'); }
+}
+function go(view, direction){
+  setNavActive(view);
+  reveal('view-' + view, direction || 'up');
+  document.getElementById('main').scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+const RENDER = { overview: renderOverview, projects: renderProjectsList, repos: renderRepos, setup: renderSetup };
+document.querySelector('.rail').addEventListener('click', e => {
+  const btn = e.target.closest('[data-nav]');
+  if(!btn) return;
+  const v = btn.dataset.nav;
+  if(RENDER[v]) RENDER[v]();
+  go(v, 'up');
+});
+
+/* ================= OVERVIEW ================= */
+function renderOverview(){
+  const rd = RANGE_DATA[currentRange];
+  const keys = Object.keys(rd);
+  const total = keys.reduce((s,k) => s + rd[k].cost, 0);
+  const flaggedCount = keys.filter(k => rd[k].flagged).length;
+  const catTotals = {}; CAT_LIST.forEach(k => catTotals[k] = 0);
+  keys.forEach(k => { const cost = rd[k].cost, ph = PHASES[k]; CAT_LIST.forEach(c => catTotals[c] += cost * (ph[c]||0) / 100); });
+  const donutTotal = Object.values(catTotals).reduce((a,b) => a+b, 0);
+  let acc = 0;
+  const stops = CAT_LIST.filter(c => catTotals[c] > 0).map(c => {
+    const start = acc/donutTotal*100; acc += catTotals[c]; const end = acc/donutTotal*100;
+    return `${CAT_VAR[c]} ${start}% ${end}%`;
+  }).join(', ');
+  const donutLegend = CAT_LIST.filter(c => catTotals[c] > 0).map(c =>
+    `<div class="src-row" style="grid-template-columns:auto 1fr auto"><span class="legend-row" style="margin:0"><span class="sw" style="background:${CAT_VAR[c]}"></span>${CAT_LABEL[c]}</span><span></span><span class="num" style="font-weight:600">${fmtMoney(catTotals[c])}</span></div>`).join('');
+
+  const activeRows = keys.map(k => {
+    const p = rd[k], meta = PROJECT_META[k], ph = PHASES[k], contrib = CONTRIBUTORS[k]||[];
+    return `<button class="rowcard" onclick="openProject('${k}',false)">
+      <div class="name-wrap"><span class="pname">${meta.name}</span>
+        <div class="pmeta"><span class="key-chip">${k}</span><span class="since">since ${meta.since}</span></div></div>
+      <div><div class="stat-lbl">Cost</div><div class="stat-val">${fmtMoney(p.cost)}</div></div>
+      <div><div class="stat-lbl">Team</div><div class="avatars">${avatarsHTML(contrib.map(c=>c.name).slice(0,5))}</div></div>
+      <div><div class="stat-lbl">Work type</div><div class="phase-bar">${phaseBarHTML(ph)}</div></div>
+      <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+        ${p.flagged ? `<span class="flag-chip">${flagSVG}Review</span>` : ''}${chevSVG}
+      </div></button>`;
+  }).join('');
+
+  const completedRows = Object.keys(COMPLETED_META).map(k => {
+    const meta = COMPLETED_META[k], ph = PHASES[k], contrib = CONTRIBUTORS[k]||[];
+    return `<button class="rowcard" onclick="openProject('${k}',true)">
+      <div class="name-wrap"><span class="pname">${meta.name}</span>
+        <div class="pmeta"><span class="key-chip">${k}</span><span class="status-chip completed">Completed</span></div></div>
+      <div><div class="stat-lbl">Duration</div><div class="stat-val" style="font-size:12.5px">${meta.started} → ${meta.completed}</div></div>
+      <div><div class="stat-lbl">Final cost</div><div class="stat-val">${fmtMoney(COMPLETED_COST[k])}</div></div>
+      <div><div class="stat-lbl">Work type</div><div class="phase-bar">${phaseBarHTML(ph)}</div></div>
+      <div style="display:flex;align-items:center;justify-content:flex-end">${chevSVG}</div></button>`;
+  }).join('');
+
+  document.getElementById('view-overview').innerHTML = `
+    <div class="topbar">
+      <div><p class="eyebrow">Home</p><h1>Overview</h1><p class="subtext">Across your team<span class="sep">·</span>sample data</p></div>
+      <div class="pillbar" id="ov-range">
+        <button data-range="today" aria-pressed="${currentRange==='today'}">Today</button>
+        <button data-range="3d" aria-pressed="${currentRange==='3d'}">Last 3 days</button>
+        <button data-range="sprint" aria-pressed="${currentRange==='sprint'}">Last sprint</button>
+      </div>
+    </div>
+    <div class="rule-accent"></div>
+
+    <div class="grid">
+      <div class="card c4">
+        <div class="card-label">AI spend <span class="pill-stat good">↑ 18%</span></div>
+        <div class="big num">${fmtMoney(total)}</div>
+        <div class="cap">Attributed across every session &amp; project</div>
+      </div>
+      <div class="card c4">
+        <div class="card-label">Sessions flagged for review</div>
+        <div class="big num" style="color:${flaggedCount ? 'var(--warn)' : 'var(--ink)'}">${flaggedCount}</div>
+        <div class="cap">Below 85% match confidence, or showing thrashing / fan-out</div>
+      </div>
+      <div class="card c4">
+        <div class="card-label">Active contributors</div>
+        <div class="big num">7</div>
+        <div class="cap">Across ${keys.length} active projects</div>
+      </div>
+
+      <div class="card c6">
+        <div class="card-label">Spend by work type</div>
+        <div style="display:flex;align-items:center;gap:22px">
+          <div style="width:112px;height:112px;border-radius:50%;flex-shrink:0;position:relative;background:conic-gradient(${stops})">
+            <div style="position:absolute;inset:19px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column">
+              <span class="num" style="font-weight:700;font-size:14px">${fmtMoney(donutTotal)}</span>
+              <span style="font-size:9.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em">total</span>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:7px">${donutLegend}</div>
+        </div>
+      </div>
+      <div class="card c6">
+        <div class="card-label">Data health</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:12.5px"><span class="pill-stat good" style="width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0">✓</span><span style="flex:1;color:var(--ink-soft)">Sessions auto-matched to a task</span><span class="num" style="font-weight:600">91%</span></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12.5px"><span class="pill-stat good" style="width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0">✓</span><span style="flex:1;color:var(--ink-soft)">Retention window respected</span><span class="num" style="font-weight:600">100%</span></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12.5px"><span class="pill-stat warn" style="width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0">!</span><span style="flex:1;color:var(--ink-soft)">Unmatched spend, needs review</span><span class="num" style="font-weight:600">$142</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head"><div><div class="section-title">Active projects</div><div class="section-sub">Click a project to see what its AI spend produced</div></div></div>
+    <div class="rowlist">${activeRows}</div>
+
+    <div class="section-head"><div><div class="section-title">Completed</div><div class="section-sub">Finished work — costs stay in the record for reporting</div></div></div>
+    <div class="rowlist">${completedRows}</div>
+  `;
+  document.getElementById('ov-range').addEventListener('click', e => {
+    const b = e.target.closest('button[data-range]'); if(!b) return;
+    currentRange = b.dataset.range; renderOverview();
+  });
+}
+
+/* ================= PROJECTS LIST ================= */
+function renderProjectsList(){
+  const rd = RANGE_DATA[currentRange];
+  const keys = Object.keys(rd);
+  const total = keys.reduce((s,k) => s + rd[k].cost, 0);
+  const flaggedCount = keys.filter(k => rd[k].flagged).length;
+
+  const activeRows = keys.map(k => {
+    const p = rd[k], meta = PROJECT_META[k], ph = PHASES[k], contrib = CONTRIBUTORS[k]||[];
+    return `<button class="rowcard" onclick="openProject('${k}',false)">
+      <div class="name-wrap"><span class="pname">${meta.name}</span>
+        <div class="pmeta"><span class="key-chip">${k}</span><span class="since">since ${meta.since}</span></div></div>
+      <div><div class="stat-lbl">Cost</div><div class="stat-val">${fmtMoney(p.cost)}</div></div>
+      <div><div class="stat-lbl">Team</div><div class="avatars">${avatarsHTML(contrib.map(c=>c.name).slice(0,5))}</div></div>
+      <div><div class="stat-lbl">Work type</div><div class="phase-bar">${phaseBarHTML(ph)}</div></div>
+      <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+        ${p.flagged ? `<span class="flag-chip">${flagSVG}Review</span>` : ''}${chevSVG}
+      </div></button>`;
+  }).join('');
+
+  const completedRows = Object.keys(COMPLETED_META).map(k => {
+    const meta = COMPLETED_META[k], ph = PHASES[k];
+    return `<button class="rowcard" onclick="openProject('${k}',true)">
+      <div class="name-wrap"><span class="pname">${meta.name}</span>
+        <div class="pmeta"><span class="key-chip">${k}</span><span class="status-chip completed">Completed</span></div></div>
+      <div><div class="stat-lbl">Duration</div><div class="stat-val" style="font-size:12.5px">${meta.started} → ${meta.completed}</div></div>
+      <div><div class="stat-lbl">Final cost</div><div class="stat-val">${fmtMoney(COMPLETED_COST[k])}</div></div>
+      <div><div class="stat-lbl">Work type</div><div class="phase-bar">${phaseBarHTML(ph)}</div></div>
+      <div style="display:flex;align-items:center;justify-content:flex-end">${chevSVG}</div></button>`;
+  }).join('');
+
+  document.getElementById('view-projects').innerHTML = `
+    <div class="topbar">
+      <div><p class="eyebrow">Team overview</p><h1>Projects</h1><p class="subtext">Cost &amp; contributor breakdown across the projects you lead</p></div>
+      <div class="pillbar" id="pr-range">
+        <button data-range="today" aria-pressed="${currentRange==='today'}">Today</button>
+        <button data-range="3d" aria-pressed="${currentRange==='3d'}">Last 3 days</button>
+        <button data-range="sprint" aria-pressed="${currentRange==='sprint'}">Last sprint</button>
+      </div>
+    </div>
+    <div class="rule-accent"></div>
+
+    <div class="grid">
+      <div class="card c4"><div class="card-label">Total spend</div><div class="big num">${fmtMoney(total)}</div><div class="cap">Across ${keys.length} active projects</div></div>
+      <div class="card c4"><div class="card-label">Active contributors</div><div class="big num">7</div><div class="cap">Across your team</div></div>
+      <div class="card c4"><div class="card-label">Sessions needing review</div><div class="big num" style="color:${flaggedCount?'var(--warn)':'var(--ink)'}">${flaggedCount}</div><div class="cap">Below 85% match confidence</div></div>
+    </div>
+
+    <div class="section-head">
+      <div><div class="section-title">Active projects</div></div>
+      <div class="legend-row">${CAT_LIST.map(c=>`<span><span class="sw" style="background:${CAT_VAR[c]}"></span>${CAT_LABEL[c]}</span>`).join('')}</div>
+    </div>
+    <div class="rowlist">${activeRows}</div>
+
+    <div class="section-head"><div><div class="section-title">Completed</div></div></div>
+    <div class="rowlist">${completedRows}</div>
+  `;
+  document.getElementById('pr-range').addEventListener('click', e => {
+    const b = e.target.closest('button[data-range]'); if(!b) return;
+    currentRange = b.dataset.range; renderProjectsList();
+  });
+}
+
+/* ================= PROJECT DETAIL ================= */
+function openProject(key, isCompleted){
+  ctx.projectKey = key; ctx.isCompleted = isCompleted;
+  const meta = isCompleted ? COMPLETED_META[key] : PROJECT_META[key];
+  const cost = isCompleted ? COMPLETED_COST[key] : RANGE_DATA[currentRange][key].cost;
+  const ph = PHASES[key];
+  const contrib = CONTRIBUTORS[key] || [];
+  const tickets = TICKETS[key] || [];
+  const sources = AI_SOURCES[key] || [];
+  const insights = INSIGHTS[key] || [];
+  const maxSrc = Math.max(...sources.map(s=>s.cost), 1);
+  const srcTotal = sources.reduce((a,s)=>a+s.cost,0);
+  const cleanCount = tickets.filter(t=>t.verdict==='good' && t.status==='closed').length;
+  const closedCount = tickets.filter(t=>t.status==='closed').length || 1;
+  const cleanPct = Math.round(100 * tickets.filter(t=>t.verdict==='good').length / tickets.length);
+  const avgReview = (tickets.reduce((a,t)=>a+t.reviewRounds,0) / tickets.length).toFixed(1);
+  const reworkPct = Math.round(100 * tickets.filter(t=>t.followupBugs>0).length / tickets.length);
+
+  const subtitle = isCompleted
+    ? `${contrib.length} contributors<span class="sep">·</span>${meta.started} → ${meta.completed}<span class="sep">·</span>${meta.duration}`
+    : `${contrib.length} contributors<span class="sep">·</span>active since ${meta.since}<span class="sep">·</span>last synced 42 min ago`;
+
+  const insightsHTML = insights.map((ins,i) => `
+    <button class="insight ${ins.level}" onclick="toggleInsight(this)" aria-expanded="false">
+      <div class="insight-head"><b class="dot"></b><span><p>${ins.text}</p></span><span class="more">Why ›</span></div>
+      <div class="insight-detail" hidden>${ins.why}</div>
+    </button>`).join('');
+
+  const sourcesHTML = sources.map(s => `
+    <div class="src-row"><span>${s.name}</span>
+      <div class="track"><div class="fill" style="width:${s.cost/maxSrc*100}%"></div></div>
+      <span class="amt num">${fmtMoney(s.cost)}</span></div>`).join('') +
+    `<p class="note" style="margin-top:6px">${sources[0] ? Math.round(sources[0].cost/srcTotal*100) : 0}% of spend runs through ${sources[0]?sources[0].name:'—'}.</p>`;
+
+  const ganttHTML = ganttChartHTML(key, tickets);
+
+  const contribHTML = contrib.map(c => `
+    <tr><td><div class="person">${avatarsHTML([c.name],26)}<span class="person-name">${c.name}</span></div></td>
+      <td><div class="mini-bar">${phaseBarHTML(c.phases)}</div></td>
+      <td class="cap">${c.since}</td>
+      <td class="r num">${c.sessions}</td>
+      <td class="r num" style="font-weight:600">${fmtMoney(c.cost)}</td>
+      <td>${c.flagged ? `<span class="flag-chip">${flagSVG}Review</span>` : ''}</td></tr>`).join('');
+
+  const cmp = COMPARE[key];
+  const goodT = cmp ? tickets.find(t=>t.key===cmp.good) : tickets.find(t=>t.verdict==='good');
+  const badT = cmp ? tickets.find(t=>t.key===cmp.bad) : tickets.slice().sort((a,b)=>b.reviewRounds-a.reviewRounds)[0];
+  const vsHTML = (goodT && badT && goodT.key !== badT.key) ? `
+    <div class="vs">
+      <div class="side"><h4>${goodT.key} <span class="verdict good" style="margin-left:6px">Shipped clean</span></h4>
+        <div class="cap">${goodT.title}</div>
+        <ul class="chain">
+          <li class="ok">${goodT.sessions} sessions, ${fmtMoney(goodT.cost)} total</li>
+          <li class="ok">${goodT.reviewRounds} review round${goodT.reviewRounds===1?'':'s'}, merged</li>
+          <li class="ok">No follow-up bugs in 30 days</li>
+        </ul></div>
+      <div class="side"><h4>${badT.key} <span class="verdict ${badT.verdict==='bad'?'bad':'mid'}" style="margin-left:6px">${badT.verdict==='bad'?'Reworked':'Needs follow-up'}</span></h4>
+        <div class="cap">${badT.title}</div>
+        <ul class="chain">
+          <li class="warn">${badT.sessions} sessions, ${fmtMoney(badT.cost)} total</li>
+          <li class="warn">${badT.reviewRounds} review rounds before merge</li>
+          <li class="${badT.followupBugs>0?'warn':'ok'}">${badT.followupBugs>0 ? badT.followupBugs+' follow-up bug within 30 days' : 'No follow-up bugs'}</li>
+        </ul></div>
+    </div>` : '';
+
+  const outcomesRows = tickets.map(t => `
+    <tr class="clickable" onclick="openTicket('${key}','${t.key}')">
+      <td><span class="tkey" style="font-family:var(--f-mono);color:var(--accent);font-weight:700;font-size:11px">${t.key}</span><br><span style="font-size:13px">${t.title}</span></td>
+      <td class="r num">${fmtMoney(t.cost)}</td>
+      <td class="r num">${t.sessions}</td>
+      <td class="r num">${t.linesChanged}</td>
+      <td class="r num">${t.reviewRounds}</td>
+      <td class="r num">${t.followupBugs}</td>
+      <td><span class="verdict ${t.verdict}">${t.verdict==='good'?'Shipped clean':t.verdict==='mid'?'Needs follow-up':'Reworked'}</span></td>
+    </tr>`).join('');
+
+  document.getElementById('view-project').innerHTML = `
+    <div class="crumb"><button onclick="go('projects','left')">Projects</button><span>/</span><span>${meta.name}</span></div>
+    <div class="topbar">
+      <div><p class="eyebrow">${key}</p><h1>${meta.name}</h1><p class="subtext">${subtitle}</p></div>
+      ${isCompleted ? '<span class="status-chip completed" style="padding:7px 13px;font-size:12px">Completed project</span>' : ''}
+    </div>
+    <div class="rule-accent"></div>
+
+    <div class="card c12" style="margin-bottom:22px">
+      <div class="card-label">Where the AI spend went<span class="num" style="font-size:19px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0">${fmtMoney(cost)}</span></div>
+      <div class="phase-bar lg">${phaseBarHTML(ph)}</div>
+      <div class="phase-legend">${phaseLegendHTML(ph, cost)}</div>
+    </div>
+
+    <div class="tabbar" id="pd-tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="overview">Overview</button>
+      <button role="tab" aria-selected="false" data-tab="contributors">Contributors</button>
+      <button role="tab" aria-selected="false" data-tab="outcomes">Outcomes</button>
+    </div>
+
+    <div class="tab-panel visible" id="pd-overview">
+      <div class="grid">
+        <div class="card c7">
+          <div class="card-label">Insights <span style="font-weight:500;text-transform:none;letter-spacing:0">Tap one to see why</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">${insightsHTML || '<p class="note">No notable signals this period.</p>'}</div>
+        </div>
+        <div class="card c5">
+          <div class="card-label">AI sources used</div>
+          <div style="display:flex;flex-direction:column;gap:4px">${sourcesHTML}</div>
+        </div>
+        <div class="card c12">
+          <div class="card-label">Tickets over time<span class="legend-row" style="font-weight:500">${CAT_LIST.map(c=>`<span><span class="sw" style="background:${CAT_VAR[c]}"></span>${CAT_LABEL[c]}</span>`).join('')}</span></div>
+          ${ganttHTML}
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="pd-contributors">
+      <div class="card c12">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Contributor</th><th>Work-type split</th><th>Since</th><th class="r">Sessions</th><th class="r">Cost</th><th></th></tr></thead>
+          <tbody>${contribHTML}</tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="pd-outcomes">
+      <div class="grid">
+        <div class="card c3"><div class="card-label">Shipped clean</div><div class="big num">${isNaN(cleanPct)?'—':cleanPct+'%'}</div><div class="cap">of AI-assisted tickets</div></div>
+        <div class="card c3"><div class="card-label">Review rounds / ticket</div><div class="big num">${avgReview}</div><div class="cap">average before merge</div></div>
+        <div class="card c3"><div class="card-label">Follow-up rate</div><div class="big num">${isNaN(reworkPct)?'—':reworkPct+'%'}</div><div class="cap">needed a fix within 30 days</div></div>
+        <div class="card c3"><div class="card-label">Closed tickets</div><div class="big num">${closedCount}</div><div class="cap">of ${tickets.length} tracked here</div></div>
+        ${vsHTML ? `<div class="card c12"><div class="card-label">Two tickets from this project</div>${vsHTML}</div>` : ''}
+        <div class="card c12">
+          <div class="card-label">Tickets: AI spend vs. outcome</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Task</th><th class="r">AI spend</th><th class="r">Sessions</th><th class="r">Lines</th><th class="r">Reviews</th><th class="r">Follow-up bugs</th><th>Outcome</th></tr></thead>
+            <tbody>${outcomesRows}</tbody>
+          </table></div>
+          <p class="note" style="margin-top:10px">Outcome summarizes evidence about the work, not about the person. It never ranks people.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('pd-tabs').addEventListener('click', e => {
+    const b = e.target.closest('button[data-tab]'); if(!b) return;
+    document.querySelectorAll('#pd-tabs button').forEach(x => x.setAttribute('aria-selected','false'));
+    b.setAttribute('aria-selected','true');
+    ['overview','contributors','outcomes'].forEach(id => {
+      const p = document.getElementById('pd-'+id);
+      p.classList.toggle('visible', id === b.dataset.tab);
+    });
+    const panel = document.getElementById('pd-'+b.dataset.tab);
+    panel.classList.remove('anim-up'); panel.getBoundingClientRect(); panel.classList.add('anim-up');
+  });
+  go('project','right');
+}
+function dominantCat(phases){ return CAT_LIST.reduce((best,k) => (phases[k]||0) > (phases[best]||0) ? k : best, CAT_LIST[0]); }
+
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dayLabel(origin, dayOffset){
+  const dt = new Date(origin + 'T00:00:00');
+  dt.setDate(dt.getDate() + Math.round(dayOffset));
+  return MONTH_SHORT[dt.getMonth()] + ' ' + dt.getDate();
+}
+function ganttChartHTML(key, tickets){
+  const meta = TIMELINE_META[key];
+  if(!meta || !tickets.length) return '<p class="note">No tickets to chart yet.</p>';
+  const nowDay = meta.nowDay;
+  const tickCount = 5;
+  const axisHTML = Array.from({length:tickCount}).map((_,i) => {
+    const d = Math.round(i/(tickCount-1) * nowDay);
+    const pct = d/nowDay*100;
+    return `<span style="left:${pct}%">${dayLabel(meta.origin, d)}</span>`;
+  }).join('');
+  const rows = tickets.slice().sort((a,b) => a.tStart - b.tStart).map(t => {
+    const left = Math.min(t.tStart/nowDay*100, 96);
+    const width = Math.max(t.tSpan/nowDay*100, 4);
+    const color = CAT_VAR[dominantCat(t.phases)];
+    return `<button class="gantt-row" onclick="openTicket('${key}','${t.key}')" title="${t.key} · ${dayLabel(meta.origin,t.tStart)} – ${t.status==='open' ? 'ongoing' : dayLabel(meta.origin,t.tStart+t.tSpan)}">
+      <div class="gantt-label"><span class="tkey">${t.key}</span><span class="gttl">${t.title}</span></div>
+      <div class="gantt-track"><div class="gantt-bar${t.status==='open'?' open':''}" style="left:${left}%;width:${width}%;background:${color}"></div></div>
+      <span class="gantt-cost num">${fmtMoney(t.cost)}</span>
+    </button>`;
+  }).join('');
+  return `<div class="gantt-wrap">
+    <div class="gantt-axis"><span></span><div class="gantt-axis-ticks">${axisHTML}</div><span></span></div>
+    <div class="gantt-rows">${rows}</div>
+  </div>`;
+}
+function toggleInsight(btn){
+  const detail = btn.querySelector('.insight-detail');
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', String(!open));
+  detail.hidden = open;
+  if(!open){ detail.classList.remove('anim-up'); detail.getBoundingClientRect(); detail.classList.add('anim-up'); }
+}
+
+/* ================= TICKET DETAIL ================= */
+function openTicket(projectKey, ticketKey){
+  const t = (TICKETS[projectKey]||[]).find(x => x.key === ticketKey);
+  if(!t) return;
+  const meta = ctx.isCompleted ? COMPLETED_META[projectKey] : PROJECT_META[projectKey];
+  const sessions = SESSIONS[ticketKey] || autoSessions(t, projectKey);
+
+  const sessHTML = sessions.map(s => `
+    <div class="sess-item">
+      <div class="sess-dot" style="background:${CAT_VAR[s.cat]}"></div>
+      <div class="sess-card">
+        <div class="sess-date">${s.date}</div>
+        <div class="sess-person">${avatarsHTML([s.employee],22)}<span style="font-size:11.5px;font-weight:600">${s.employee}</span></div>
+        <div class="sess-tool">${s.tool}</div>
+        <div class="sess-cost num">${fmtMoney(s.cost)}</div>
+        <div class="sess-flags">${s.flags.map(fk => `<span class="sig-chip hot" title="${FLAG_META[fk].tip}">${FLAG_META[fk].icon}${FLAG_META[fk].label}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+
+  const toolAgg = {};
+  sessions.forEach(s => { toolAgg[s.tool] = (toolAgg[s.tool] || 0) + s.cost; });
+  const toolRows = Object.entries(toolAgg).sort((a,b) => b[1]-a[1]);
+  const toolTotal = toolRows.reduce((a,r) => a+r[1], 0) || 1;
+  const maxTool = Math.max(...toolRows.map(r => r[1]), 1);
+  const toolHTML = toolRows.map(([name,cost]) => `
+    <div class="src-row"><span>${name}</span>
+      <div class="track"><div class="fill" style="width:${cost/maxTool*100}%"></div></div>
+      <span class="amt num">${fmtMoney(cost)}</span></div>`).join('') +
+    (toolRows[0] ? `<p class="note" style="margin-top:6px">${Math.round(toolRows[0][1]/toolTotal*100)}% of this ticket's spend runs through ${toolRows[0][0]}.</p>` : '');
+
+  const agg = {};
+  sessions.forEach(s => { if(!agg[s.employee]) agg[s.employee] = {cost:0,sessions:0,phases:{plan:0,impl:0,test:0,debug:0,review:0}}; agg[s.employee].cost += s.cost; agg[s.employee].sessions += 1; agg[s.employee].phases[s.cat] += 1; });
+  const contribRows = Object.entries(agg).map(([name,d]) => {
+    const tot = Object.values(d.phases).reduce((a,b)=>a+b,0) || 1;
+    const pct = {}; CAT_LIST.forEach(k => pct[k] = Math.round(d.phases[k]/tot*100));
+    return `<tr><td><div class="person">${avatarsHTML([name],26)}<span class="person-name">${name}</span></div></td>
+      <td><div class="mini-bar">${phaseBarHTML(pct)}</div></td>
+      <td class="r num">${d.sessions}</td>
+      <td class="r num" style="font-weight:600">${fmtMoney(d.cost)}</td></tr>`;
+  }).join('');
+
+  document.getElementById('view-ticket').innerHTML = `
+    <div class="crumb">
+      <button onclick="go('projects','left')">Projects</button><span>/</span>
+      <button onclick="go('project','left')">${meta.name}</button><span>/</span><span>${t.key}</span>
+    </div>
+    <div class="topbar">
+      <div><p class="eyebrow">${t.key}</p><h1>${t.title}</h1>
+        <p class="subtext">${t.assignees.length} contributor${t.assignees.length>1?'s':''}<span class="sep">·</span>started ${t.started}<span class="sep">·</span>last activity ${t.last}</p></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="status-chip ${t.status}" style="padding:7px 13px;font-size:12px">${t.status==='open'?'Open':'Closed'}</span>
+        <span class="verdict ${t.verdict}" style="padding:7px 13px;font-size:12px">${t.verdict==='good'?'Shipped clean':t.verdict==='mid'?'Needs follow-up':'Reworked'}</span>
+      </div>
+    </div>
+    <div class="rule-accent"></div>
+
+    <div class="grid" style="margin-bottom:22px">
+      <div class="card c7">
+        <div class="card-label">Where this ticket's budget went<span class="num" style="font-size:19px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0">${fmtMoney(t.cost)}</span></div>
+        <div class="phase-bar lg">${phaseBarHTML(t.phases)}</div>
+        <div class="phase-legend">${phaseLegendHTML(t.phases, t.cost)}</div>
+      </div>
+      <div class="card c5">
+        <div class="card-label">AI tools on this ticket</div>
+        <div style="display:flex;flex-direction:column;gap:4px">${toolHTML}</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div><div class="section-title">Session timeline</div><div class="section-sub">One card per AI session matched to this ticket</div></div>
+      <div class="legend-row">${Object.values(FLAG_META).map(f=>`<span class="sig-chip">${f.icon}${f.label}</span>`).join('')}</div>
+    </div>
+    <div class="sess-strip"><div class="sess-items">${sessHTML}</div></div>
+
+    <div class="section-head"><div><div class="section-title">Contributors on this ticket</div></div></div>
+    <div class="card c12">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Contributor</th><th>Work-type split</th><th class="r">Sessions</th><th class="r">Cost</th></tr></thead>
+        <tbody>${contribRows}</tbody>
+      </table></div>
+    </div>
+  `;
+  go('ticket','right');
+}
+
+/* ================= REPOSITORIES ================= */
+function renderRepos(){
+  const cards = REPOS.map(r => {
+    const band = readinessBand(r.readiness);
+    const color = band==='good' ? 'var(--good)' : band==='mid' ? 'var(--warn)' : 'var(--bad)';
+    const trackColor = band==='good' ? 'var(--good-soft)' : band==='mid' ? 'var(--warn-soft)' : 'var(--bad-soft)';
+    return `<div class="repo-card">
+      <div class="repo-top">
+        <div><div class="repo-name">${r.name}</div><div class="repo-proj">${r.project}</div></div>
+        <div class="ring" style="background:conic-gradient(${color} ${r.readiness}%, ${trackColor} 0)">
+          <div class="hole" style="color:${color}">${r.readiness}</div>
+        </div>
+      </div>
+      <dl class="repo-kv">
+        <dt>AI sessions</dt><dd class="num">${r.sessions}</dd>
+        <dt>Merged without rework</dt><dd class="num">${r.mergedClean}%</dd>
+        <dt>AI iterations / task</dt><dd class="num">${r.iter}</dd>
+        <dt>Test coverage</dt><dd class="num">${r.coverage}%</dd>
+        <dt>Docs</dt><dd><span class="docs-chip ${r.docs}">${docsLabel(r.docs)}</span></dd>
+      </dl>
+      <p class="repo-fix">${r.fix}</p>
+    </div>`;
+  }).join('');
+
+  document.getElementById('view-repos').innerHTML = `
+    <div class="topbar">
+      <div><p class="eyebrow">Portfolio</p><h1>Where does AI work well?</h1>
+        <p class="subtext">AI readiness per repository, learned from how AI-assisted work actually went there</p></div>
+    </div>
+    <div class="rule-accent"></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${cards}</div>
+
+    <div class="section-head"><div><div class="section-title">The loop</div><div class="section-sub">Why this score moves over time</div></div></div>
+    <div class="loop-card">
+      <ul class="chain">
+        <li>AI works in the codebase every day</li>
+        <li>This page shows where it struggles, and why</li>
+        <li class="warn">The team improves tests, docs and boundaries there</li>
+        <li class="ok">AI gets more effective, and the score moves</li>
+      </ul>
+    </div>
+  `;
+}
+
+/* ================= SETUP ================= */
+function renderSetup(){
+  document.getElementById('view-setup').innerHTML = `
+    <div class="topbar"><div><p class="eyebrow">Get started</p><h1>Set up your world</h1>
+      <p class="subtext">Connect your AI and work tools. Everything else is built on this.</p></div></div>
+    <div class="rule-accent"></div>
+    <div class="grid">
+      <div class="card c6">
+        <div class="card-label">AI tools</div>
+        <div>
+          <div class="conn"><div class="logo-badge" style="background:#C96442">Cl</div><div class="conn-meta"><div class="name">Claude (Code + Chat)</div><div class="sub">Usage + session logs · 22 seats</div></div><button class="btn on" onclick="toggleConn(this)">Connected</button></div>
+          <div class="conn"><div class="logo-badge" style="background:#000">Cu</div><div class="conn-meta"><div class="name">Cursor</div><div class="sub">Team usage API · 14 seats</div></div><button class="btn on" onclick="toggleConn(this)">Connected</button></div>
+          <div class="conn"><div class="logo-badge" style="background:#6E40C9">Co</div><div class="conn-meta"><div class="name">GitHub Copilot</div><div class="sub">Org billing + metrics</div></div><button class="btn on" onclick="toggleConn(this)">Connected</button></div>
+        </div>
+      </div>
+      <div class="card c6">
+        <div class="card-label">Work tools</div>
+        <div>
+          <div class="conn"><div class="logo-badge" style="background:#2684FF">Ji</div><div class="conn-meta"><div class="name">Jira</div><div class="sub">5 projects · 9 boards found</div></div><button class="btn on" onclick="toggleConn(this)">Connected</button></div>
+          <div class="conn"><div class="logo-badge" style="background:#24292F">Gh</div><div class="conn-meta"><div class="name">GitHub</div><div class="sub">acme-eng · 38 repositories found</div></div><button class="btn on" onclick="toggleConn(this)">Connected</button></div>
+        </div>
+        <p class="note" style="margin-top:10px">Jira gives us tasks and durations. GitHub gives us branches, PRs and commits, which link AI sessions to tasks.</p>
+      </div>
+    </div>
+  `;
+}
+function toggleConn(btn){
+  const on = btn.classList.toggle('on');
+  btn.textContent = on ? 'Connected' : 'Connect';
+}
+
+/* ================= boot ================= */
+renderOverview();
+renderProjectsList();
+renderRepos();
+renderSetup();
+</script>
+</body></html>
