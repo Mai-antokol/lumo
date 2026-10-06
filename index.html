@@ -254,52 +254,21 @@
   .browser-frame{background:var(--night-2); border:1px solid var(--night-line); border-radius:16px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,0.35); margin-top:44px;}
   .browser-chrome{display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--night-line);}
   .chrome-dot{width:9px; height:9px; border-radius:50%;}
-  .browser-body{padding:26px; background:linear-gradient(160deg, rgba(139,133,255,0.06), transparent 55%), #F4F5FA;}
-  .bb-topbar{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
-  .bb-eyebrow{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#6B7080; margin:0 0 4px;}
-  .bb-title{font-size:19px; font-weight:750; color:#161927; font-family:var(--display);}
-  .bb-tabs{display:flex; gap:2px; background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:9px; padding:3px;}
-  .bb-tab{font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; color:#6B7080; border:none; background:transparent; cursor:pointer; font-family:inherit; transition:background .15s ease, color .15s ease;}
-  .bb-tab:hover:not(.active){background:rgba(20,25,50,0.05);}
-  .bb-tab.active{background:#4F46E5; color:#fff;}
-  .bb-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;}
-  @media (max-width:640px){ .bb-grid{grid-template-columns:1fr 1fr;} }
-  .bb-card{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:14px; padding:15px 17px; box-shadow:0 1px 2px rgba(16,24,40,0.04), 0 8px 20px rgba(80,70,180,0.06);}
-  .bb-label{font-family:var(--mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#6B7080; display:flex; justify-content:space-between; margin-bottom:10px;}
-  .bb-value{font-family:var(--mono); font-size:23px; font-weight:650; color:#161927;}
-  .bb-cap{font-size:11px; color:#6B7080; margin-top:4px;}
-  .bb-rows{display:flex; flex-direction:column; gap:8px;}
-  .bb-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:13px 16px; display:grid; grid-template-columns:1.6fr 0.8fr 1fr auto; align-items:center; gap:14px; font-size:12.5px; transition:transform .18s ease, box-shadow .18s ease;}
-  .bb-row:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,24,40,0.08);}
-  @media (max-width:640px){ .bb-row{grid-template-columns:1fr; gap:8px;} }
-  .bb-proj-name{font-weight:700; color:#161927; font-size:13.5px;}
-  .bb-proj-key{font-family:var(--mono); font-size:10px; color:#4F46E5; background:#EEEDFD; padding:1px 6px; border-radius:5px; font-weight:700; margin-left:8px;}
-  .bb-stat-label{font-size:10px; color:#9297AA; text-transform:uppercase; letter-spacing:0.04em; font-weight:600;}
-  .bb-stat-value{font-family:var(--mono); font-weight:600; color:#161927; font-size:13px;}
+  .shot-link{display:block; text-decoration:none; color:inherit; transition:transform .2s ease, box-shadow .2s ease;}
+  .shot-link:hover{transform:translateY(-4px); box-shadow:0 40px 80px rgba(0,0,0,0.45);}
+  .chrome-url{margin-left:12px; font-family:var(--mono); font-size:11.5px; color:var(--night-text-soft); background:rgba(255,255,255,0.06); border-radius:6px; padding:3px 10px;}
+  .shot-body{position:relative; background:#F5F4F2;}
+  .shot-body img{width:100%; height:auto;}
+  .shot-cta{position:absolute; right:18px; bottom:18px; background:var(--accent-2); color:var(--night); font-weight:600; font-size:14px; padding:10px 16px; border-radius:11px; box-shadow:0 10px 24px rgba(0,0,0,0.25); opacity:0; transform:translateY(6px); transition:opacity .2s ease, transform .2s ease;}
+  .shot-link:hover .shot-cta, .shot-link:focus-visible .shot-cta{opacity:1; transform:none;}
+  @media (hover:none){ .shot-cta{opacity:1; transform:none; font-size:12.5px; padding:8px 12px; right:10px; bottom:10px;} }
   .bb-caption{text-align:center; font-size:12px; color:var(--night-text-soft); margin-top:16px;}
-  .bb-sample{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9A6300; background:#FEF6E7; border:1px dashed rgba(154,99,0,0.35); border-radius:6px; padding:3px 8px; vertical-align:middle;}
-  .bb-sample::before{content:""; width:6px; height:6px; border-radius:50%; background:#F0A93B;}
-  .bb-drill{margin-top:22px; padding-top:20px; border-top:1px dashed rgba(20,25,50,0.14);}
-  .bb-subhead{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;}
-  .bb-subtitle{font-size:15px; font-weight:750; color:#161927; font-family:var(--display);}
-  .bb-subtitle .bb-proj-key{margin-left:6px;}
-  .bb-person-head{display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; gap:14px; padding:0 17px 2px;}
-  @media (max-width:640px){ .bb-person-head{display:none;} }
-  .bb-more{border:1px dashed rgba(20,25,50,0.14); border-radius:12px; padding:9px 16px; display:flex; justify-content:space-between; font-size:12px; color:#6B7080;}
   .view-points{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:28px;}
   @media (max-width:760px){ .view-points{grid-template-columns:1fr;} }
   .view-point{border:1px solid var(--night-line); border-radius:14px; padding:18px 20px; background:rgba(255,255,255,0.03);}
   .view-point-label{font-family:var(--mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent-2); margin-bottom:6px;}
   .view-point p{font-size:14px; color:var(--night-text-soft);}
   .view-point strong{color:var(--night-text); font-weight:600;}
-  .bb-people{display:flex; flex-direction:column; gap:8px;}
-  .bb-person-row{background:#fff; border:1px solid rgba(20,25,50,0.08); border-radius:12px; padding:11px 16px; display:grid; grid-template-columns:1.5fr 1fr 0.55fr 0.65fr; align-items:center; gap:14px; font-size:12.5px; transition:transform .18s ease, box-shadow .18s ease;}
-  .bb-person-row:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,24,40,0.08);}
-  @media (max-width:640px){ .bb-person-row{grid-template-columns:1fr 1fr; row-gap:8px;} }
-  .bb-person{display:flex; align-items:center; gap:9px;}
-  .bb-avatar{width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800; color:#fff; flex-shrink:0;}
-  .bb-person-name{font-weight:700; color:#161927;}
-  .bb-tickets{font-size:10.5px; color:#9297AA; margin-top:1px;}
 
   /* ---------- Categories ---------- */
   .cat-layout{display:grid; grid-template-columns:220px 1fr; gap:44px; align-items:center; margin-top:44px;}
@@ -591,126 +560,18 @@
       <h2 style="color:var(--night-text);">One dashboard. Total clarity.</h2>
       <p class="lede" style="color:var(--night-text-soft);">Team leads see the whole picture at a glance. Drill into any project, then switch to a per-person view to see exactly who worked on what, and where the AI budget went.</p>
 
-      <div class="browser-frame">
+      <a class="browser-frame shot-link" href="demo.html" target="_blank" rel="noopener" aria-label="Open the live demo in a new tab">
         <div class="browser-chrome">
           <span class="chrome-dot" style="background:#F0A93B;"></span>
           <span class="chrome-dot" style="background:#8B93F8;"></span>
           <span class="chrome-dot" style="background:#17B8A6;"></span>
+          <span class="chrome-url">llumooo.com/demo</span>
         </div>
-        <div class="browser-body">
-          <div class="bb-topbar">
-            <div>
-              <p class="bb-eyebrow">Team overview <span class="bb-sample" style="margin-left:6px;">Example data</span></p>
-              <div class="bb-title">My Projects</div>
-            </div>
-            <div class="bb-tabs">
-              <button type="button" class="bb-tab" data-range="today">Today</button>
-              <button type="button" class="bb-tab active" data-range="3d">Last 3 Days</button>
-              <button type="button" class="bb-tab" data-range="sprint">Last Sprint</button>
-            </div>
-          </div>
-          <div class="bb-grid">
-            <div class="bb-card">
-              <div class="bb-label">Total Team Spend</div>
-              <div class="bb-value" id="bbSpend">$1,638</div>
-              <div class="bb-cap">Across 4 active projects</div>
-            </div>
-            <div class="bb-card">
-              <div class="bb-label">Active Contributors</div>
-              <div class="bb-value">7</div>
-              <div class="bb-cap">Across your team</div>
-            </div>
-            <div class="bb-card">
-              <div class="bb-label">Needs Review</div>
-              <div class="bb-value" id="bbReview" style="color:#9A6300;">2</div>
-              <div class="bb-cap">Below 85% match confidence</div>
-            </div>
-          </div>
-          <div class="bb-rows">
-            <div class="bb-row">
-              <div><span class="bb-proj-name">Search Revamp</span><span class="bb-proj-key">SRCH</span></div>
-              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value" id="bbCostSRCH">$701</div></div>
-              <div><div class="bb-stat-label">Phase split</div>
-                <div class="phase-bar" id="bbPhaseSRCH" style="margin:0; height:7px;">
-                  <div class="phase-seg" style="width:10%; background:var(--c-planning);"></div>
-                  <div class="phase-seg" style="width:60%; background:var(--c-coding);"></div>
-                  <div class="phase-seg" style="width:22%; background:var(--c-test);"></div>
-                  <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
-                </div>
-              </div>
-              <div style="font-size:11px; color:#9A6300; font-weight:700;">Review</div>
-            </div>
-            <div class="bb-row">
-              <div><span class="bb-proj-name">Checkout Redesign</span><span class="bb-proj-key">PAY</span></div>
-              <div><div class="bb-stat-label">Cost</div><div class="bb-stat-value" id="bbCostPAY">$482</div></div>
-              <div><div class="bb-stat-label">Phase split</div>
-                <div class="phase-bar" id="bbPhasePAY" style="margin:0; height:7px;">
-                  <div class="phase-seg" style="width:15%; background:var(--c-planning);"></div>
-                  <div class="phase-seg" style="width:55%; background:var(--c-coding);"></div>
-                  <div class="phase-seg" style="width:20%; background:var(--c-test);"></div>
-                  <div class="phase-seg" style="width:10%; background:var(--c-deploy);"></div>
-                </div>
-              </div>
-              <div></div>
-            </div>
-          </div>
-
-          <div class="bb-drill">
-          <div class="bb-subhead">
-            <div>
-              <p class="bb-eyebrow">Project drill-down</p>
-              <div class="bb-subtitle">Search Revamp<span class="bb-proj-key">SRCH</span></div>
-            </div>
-            <div class="bb-tabs" aria-label="View">
-              <span class="bb-tab">By ticket</span>
-              <span class="bb-tab active">By person</span>
-            </div>
-          </div>
-          <div class="bb-person-head">
-            <span class="bb-stat-label">Contributor</span>
-            <span class="bb-stat-label">Phase split</span>
-            <span class="bb-stat-label">Sessions</span>
-            <span class="bb-stat-label">AI cost</span>
-          </div>
-          <div class="bb-people">
-            <div class="bb-person-row">
-              <div class="bb-person"><span class="bb-avatar" style="background:#4F46E5;">NL</span><div><div class="bb-person-name">Noa Levi</div><div class="bb-tickets">SRCH-101, SRCH-096</div></div></div>
-              <div class="phase-bar" style="margin:0; height:6px;">
-                <div class="phase-seg" style="width:8%; background:var(--c-planning);"></div>
-                <div class="phase-seg" style="width:64%; background:var(--c-coding);"></div>
-                <div class="phase-seg" style="width:20%; background:var(--c-test);"></div>
-                <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
-              </div>
-              <div class="bb-stat-value" id="bbSess0">14</div>
-              <div class="bb-stat-value" id="bbPCost0">$245</div>
-            </div>
-            <div class="bb-person-row">
-              <div class="bb-person"><span class="bb-avatar" style="background:#17B8A6;">IB</span><div><div class="bb-person-name">Itai Ben-David</div><div class="bb-tickets">SRCH-104</div></div></div>
-              <div class="phase-bar" style="margin:0; height:6px;">
-                <div class="phase-seg" style="width:12%; background:var(--c-planning);"></div>
-                <div class="phase-seg" style="width:55%; background:var(--c-coding);"></div>
-                <div class="phase-seg" style="width:25%; background:var(--c-test);"></div>
-                <div class="phase-seg" style="width:8%; background:var(--c-deploy);"></div>
-              </div>
-              <div class="bb-stat-value" id="bbSess1">9</div>
-              <div class="bb-stat-value" id="bbPCost1" style="color:#9A6300;">$172</div>
-            </div>
-            <div class="bb-person-row">
-              <div class="bb-person"><span class="bb-avatar" style="background:#F0A93B;">YR</span><div><div class="bb-person-name">Yael Regev</div><div class="bb-tickets">SRCH-101</div></div></div>
-              <div class="phase-bar" style="margin:0; height:6px;">
-                <div class="phase-seg" style="width:6%; background:var(--c-planning);"></div>
-                <div class="phase-seg" style="width:70%; background:var(--c-coding);"></div>
-                <div class="phase-seg" style="width:18%; background:var(--c-test);"></div>
-                <div class="phase-seg" style="width:6%; background:var(--c-deploy);"></div>
-              </div>
-              <div class="bb-stat-value" id="bbSess2">11</div>
-              <div class="bb-stat-value" id="bbPCost2">$158</div>
-            </div>
-            <div class="bb-more"><span>+ 1 more contributor</span><span class="mono" id="bbPCostMore">$126</span></div>
-          </div>
-          </div>
+        <div class="shot-body">
+          <img src="assets/demo-overview.png" width="2560" height="1600" loading="lazy" alt="llumooo dashboard overview: AI spend, spend by work type, data health and active projects, shown with sample data">
+          <span class="shot-cta">Open the live demo ↗</span>
         </div>
-      </div>
+      </a>
       <p class="bb-caption">Illustrative example — the names, projects and numbers shown are fictional.</p>
 
       <div class="view-points">
@@ -920,57 +781,6 @@
     function onScroll(){ nav.classList.toggle('scrolled', window.scrollY > 8); }
     window.addEventListener('scroll', onScroll, {passive:true});
     onScroll();
-  })();
-
-  // Interactive dashboard preview: switch time range, swap real numbers
-  (function(){
-    var DATA = {
-      today:  { spend:'$612',   review:'1', SRCH:{cost:'$271',   phases:[8,62,22,8]},  PAY:{cost:'$180',   phases:[12,58,20,10]},
-                people:{ sessions:['5','3','4'],    costs:['$95','$66','$61'],    more:'$49' } },
-      '3d':   { spend:'$1,638', review:'2', SRCH:{cost:'$701',   phases:[10,60,22,8]}, PAY:{cost:'$482',   phases:[15,55,20,10]},
-                people:{ sessions:['14','9','11'],  costs:['$245','$172','$158'], more:'$126' } },
-      sprint: { spend:'$4,920', review:'4', SRCH:{cost:'$1,890', phases:[9,61,21,9]},  PAY:{cost:'$1,540', phases:[18,52,20,10]},
-                people:{ sessions:['38','24','30'], costs:['$660','$464','$428'], more:'$338' } }
-    };
-    var PHASE_COLORS = ['var(--c-planning)','var(--c-coding)','var(--c-test)','var(--c-deploy)'];
-    function renderPhaseBar(el, phases){
-      if(!el) return;
-      el.innerHTML = phases.map(function(p, i){
-        return '<div class="phase-seg" style="width:'+p+'%; background:'+PHASE_COLORS[i]+';"></div>';
-      }).join('');
-    }
-    function applyRange(key){
-      var d = DATA[key];
-      if(!d) return;
-      var spendEl = document.getElementById('bbSpend');
-      var reviewEl = document.getElementById('bbReview');
-      var srchCostEl = document.getElementById('bbCostSRCH');
-      var payCostEl = document.getElementById('bbCostPAY');
-      if(spendEl) spendEl.textContent = d.spend;
-      if(reviewEl) reviewEl.textContent = d.review;
-      if(srchCostEl) srchCostEl.textContent = d.SRCH.cost;
-      if(payCostEl) payCostEl.textContent = d.PAY.cost;
-      renderPhaseBar(document.getElementById('bbPhaseSRCH'), d.SRCH.phases);
-      renderPhaseBar(document.getElementById('bbPhasePAY'), d.PAY.phases);
-      d.people.sessions.forEach(function(v, i){
-        var el = document.getElementById('bbSess'+i);
-        if(el) el.textContent = v;
-      });
-      d.people.costs.forEach(function(v, i){
-        var el = document.getElementById('bbPCost'+i);
-        if(el) el.textContent = v;
-      });
-      var moreEl = document.getElementById('bbPCostMore');
-      if(moreEl) moreEl.textContent = d.people.more;
-    }
-    var tabs = document.querySelectorAll('.bb-tab[data-range]');
-    tabs.forEach(function(tab){
-      tab.addEventListener('click', function(){
-        tabs.forEach(function(t){ t.classList.remove('active'); });
-        tab.classList.add('active');
-        applyRange(tab.dataset.range);
-      });
-    });
   })();
 </script>
 
