@@ -329,6 +329,20 @@
   .pilot-badge{display:inline-flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; color:var(--accent-2); background:rgba(63,224,203,0.12); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
   .pilot-dot{width:6px; height:6px; border-radius:50%; background:var(--accent-2);}
 
+  /* ---------- Member of ---------- */
+  .backed-strip{text-align:center; padding:48px 0 8px;}
+  .backed-label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint); margin-bottom:18px;}
+  .backed-card{display:inline-flex; align-items:center; justify-content:center;}
+  .backed-card img{display:block; height:46px; width:auto;}
+  .backed-card .on-dark{display:none;}
+  @media (max-width:480px){ .backed-card img{height:36px;} }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .backed-card .on-light{display:none;}
+    :root:not([data-theme="light"]) .backed-card .on-dark{display:block;}
+  }
+  :root[data-theme="dark"] .backed-card .on-light{display:none;}
+  :root[data-theme="dark"] .backed-card .on-dark{display:block;}
+
   /* ---------- Footer ---------- */
   .footer{border-top:1px solid var(--line); padding-block:52px 40px;}
   .footer-top{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; margin-bottom:40px;}
@@ -476,7 +490,7 @@
             <span class="ticket-status">In Progress</span>
           </div>
           <div class="ticket-title">Typo-tolerant search matching</div>
-          <div class="ticket-meta">Noa Levi, Yael Regev · 14 AI sessions</div>
+          <div class="ticket-meta">Noa Levi, Maya Regev · 14 AI sessions</div>
           <div class="ticket-cost-row">
             <span class="ticket-cost mono">$312</span>
             <span class="ticket-cost-label">AI cost so far</span>
@@ -718,6 +732,15 @@
           </button>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- MEMBER OF -->
+  <section class="backed-strip wrap">
+    <p class="backed-label">Member of</p>
+    <div class="backed-card">
+      <img class="on-light" src="assets/nvidia-inception-light.png" width="833" height="295" alt="NVIDIA Inception Program">
+      <img class="on-dark" src="assets/nvidia-inception-dark.png" width="833" height="295" alt="NVIDIA Inception Program">
     </div>
   </section>
 
